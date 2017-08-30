@@ -1,7 +1,7 @@
 [
     {
         "ParameterKey": "AvailabilityZones",
-        "ParameterValue": "$[taskcat_genaz_2]"
+        "ParameterValue": "$[taskcat_getaz_2]"
     },
     {
         "ParameterKey": "ASGMyInstanceType",
@@ -9,23 +9,11 @@
     },
     {
         "ParameterKey": "SAPMasterPass",
-        "ParameterValue": "somckitk-master-pass"
-    },
-    {
-        "ParameterKey": "QSS3BucketName",
-        "ParameterValue": "somckitk-swpm"
-    },
-    {
-        "ParameterKey": "QSS3KeyPrefix",
-        "ParameterValue": ""
+        "ParameterValue": "$[taskcat_genpass_16]"
     },
     {
         "ParameterKey": "BASTIONInstanceType",
-        "ParameterValue": "m4.large"
-    },
-    {
-        "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "0.0.0.0/0"
+        "ParameterValue": "t2.large"
     },
     {
         "ParameterKey": "Encryption",
@@ -33,15 +21,15 @@
     },
     {
         "ParameterKey": "SAPInstallMedia",
-        "ParameterValue": "s3://somckitk-swpm/"
+        "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/swpm/"
     },
     {
         "ParameterKey": "HANAInstallMedia",
-        "ParameterValue": "s3://somckitk-useast1/HANA-SP12/"
+        "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/hana/sps12/"
     },
     {
         "ParameterKey": "HANAMasterPass",
-        "ParameterValue": "SAP4fouraws"
+        "ParameterValue": "$[taskcat_genpass_16]"
     },
     {
         "ParameterKey": "HostCount",
@@ -61,7 +49,7 @@
     },
     {
         "ParameterKey": "KeyName",
-        "ParameterValue": "somckitk_SAPTESTING"
+        "ParameterValue": "$[taskcat_getkeypair]"
     },
     {
         "ParameterKey": "HANAInstanceType",
@@ -81,19 +69,19 @@
     },
     {
         "ParameterKey": "PrivateSubnet1CIDR",
-        "ParameterValue": "10.69.1.0/24"
+        "ParameterValue": "10.0.0.0/19"
     },
     {
         "ParameterKey": "PrivateSubnet2CIDR",
-        "ParameterValue": "10.69.2.0/24"
+        "ParameterValue": "10.0.32.0/19"
     },
     {
         "ParameterKey": "PublicSubnet1CIDR",
-        "ParameterValue": "10.69.3.0/24"
+        "ParameterValue": "10.0.128.0/20"
     },
     {
         "ParameterKey": "PublicSubnet2CIDR",
-        "ParameterValue": "10.69.4.0/24"
+        "ParameterValue": "10.0.144.0/20"
     },
     {
         "ParameterKey": "RDPInstanceType",
@@ -101,7 +89,7 @@
     },
     {
         "ParameterKey": "RemoteAccessCIDR",
-        "ParameterValue": "0.0.0.0/0"
+        "ParameterValue": "10.0.0.0/16"
     },
     {
         "ParameterKey": "SAPInstanceNum",
