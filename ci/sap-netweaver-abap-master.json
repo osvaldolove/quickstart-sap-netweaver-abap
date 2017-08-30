@@ -64,10 +64,6 @@
         "ParameterValue": "SuSE-Linux-12-SP1-HVM"
     },
     {
-        "ParameterKey": "PrivSubCIDR",
-        "ParameterValue": "10.69.0.0/16"
-    },
-    {
         "ParameterKey": "PrivateSubnet1CIDR",
         "ParameterValue": "10.0.0.0/19"
     },
@@ -126,5 +122,9 @@
     {
         "ParameterKey": "VolumeType",
         "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "VPCCIDR",
+        "ParameterValue": "10.0.0.0/16"
     }
 ]
