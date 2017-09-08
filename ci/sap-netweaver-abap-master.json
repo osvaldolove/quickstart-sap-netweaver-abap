@@ -4,6 +4,10 @@
         "ParameterValue": "$[taskcat_getaz_2]"
     },
     {
+        "ParameterKey": "AutoRecovery",
+        "ParameterValue": "Yes"
+    },
+    {
         "ParameterKey": "ASGMyInstanceType",
         "ParameterValue": "r4.large"
     },
