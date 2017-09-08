@@ -21,7 +21,7 @@
     },
     {
         "ParameterKey": "SAPInstallMedia",
-        "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/swpm/"
+        "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/netweaver/abap/740/"
     },
     {
         "ParameterKey": "HANAInstallMedia",
