@@ -49,6 +49,7 @@
                     },
                     "Parameters": [
                         "MyOS",
+                        "AutoRecovery",
                         "SAPPASHostname",
                         "SID",
                         "MyInstanceType",
@@ -103,46 +104,49 @@
             ],
             "ParameterLabels": {
                 "ASGMyInstanceType": {
-                    "default": "Choose instance type for SAP Autoscaling App Servers"
+                    "default": "SAP Autoscaling App Server instance types"
+                },
+                "AutoRecovery": {
+                    "default": "EC2 Auto Recovery"
                 },
                 "BASTIONInstanceType": {
-                    "default": "Choose instance type for bastion host"
+                    "default": "Bastion host"
                 },
                 "Encryption": {
-                    "default": "Would you like to turn on encryption?"
+                    "default": "Enable encryption"
                 },
                 "HANAHostCount": {
-                    "default": "Enter number of SAP HANA hosts"
+                    "default": "SAP HANA host count"
                 },
                 "HANAInstallMedia": {
-                    "default": "Enter Amazon S3 URL for SAP HANA software."
+                    "default": "S3 bucket for HANA s/w."
                 },
                 "HANAInstanceType": {
-                    "default": "Choose instance type for HANA Server"
+                    "default": "SAP HANA Server "
                 },
                 "HANAMasterPass": {
-                    "default": "Enter SAP HANA password"
+                    "default": "SAP HANA password"
                 },
                 "HostCount": {
-                    "default": "Enter number of SAP App Servers for Autoscaling Group"
+                    "default": "Number of SAP Servers for Autoscaling Group"
                 },
                 "InstallRDPAndBastionInstance": {
-                    "default": "Install RDP and Bastion?"
+                    "default": "Install RDP and Bastion"
                 },
                 "InstallSAP": {
-                    "default": "Install SAP software?"
+                    "default": "Install SAP software"
                 },
                 "InstallSAPASG": {
-                    "default": "Install SAP Autoscaling Group?"
+                    "default": "Install Autoscaling Group"
                 },
                 "KeyName": {
-                    "default": "Choose key pair"
+                    "default": "SSH key pair"
                 },
                 "MyInstanceType": {
-                    "default": "Choose instance type for SAP PAS Server"
+                    "default": "SAP PAS Server type"
                 },
                 "MyOS": {
-                    "default": "Operating system version for SAP Servers (SLES only)"
+                    "default": "O.S. version for SAP Servers (SLES only)"
                 },
                 "MyOSHANA": {
                     "default": "Operating system version for HANA (RHEL or SLES)"
@@ -160,57 +164,66 @@
                     "default": "Public subnet 2 CIDR"
                 },
                 "QSS3BucketName": {
-                    "default": "Enter S3 bucket name for the Quick Start assets."
+                    "default": "S3 bucket name for the Quick Start assets."
                 },
                 "QSS3KeyPrefix": {
-                    "default": "Enter S3 key prefix for the Quick Start assets"
+                    "default": "S3 key prefix for the Quick Start assets"
                 },
                 "RDPInstanceType": {
-                    "default": "Choose instance type for RDP host"
+                    "default": "RDP instance"
                 },
                 "RemoteAccessCIDR": {
-                    "default": "Enter CIDR block for RDP & Bastion access"
+                    "default": "CIDR block for RDP & Bastion access"
                 },
                 "SAPAASHostname": {
-                    "default": "Enter SAP A.A.S. Server host name (i.e. sapaas00)"
+                    "default": "SAP A.A.S. Server host name (i.e. sapaas00)"
                 },
                 "SAPHANAHostname": {
-                    "default": "Enter SAP HANA Server host name (i.e. saphanaqs)"
+                    "default": "SAP HANA Server host name (i.e. saphanaqs)"
                 },
                 "SAPInstallMedia": {
-                    "default": "Enter Amazon S3 URL for SAP NetWeaver software."
+                    "default": "S3 bucket for SAP NetWeaver s/w."
                 },
                 "SAPInstanceNum": {
-                    "default": "Enter SAP instance number"
+                    "default": "SAP instance number"
                 },
                 "SAPMasterPass": {
-                    "default": "Enter name of SSM parameter store for master password"
+                    "default": "Name of SSM parameter store for master password"
                 },
                 "SAPPASHostname": {
-                    "default": "Enter SAP P.A.S. Server host name (i.e. sappas00)"
+                    "default": "SAP P.A.S. Server host name (i.e. sappas00)"
                 },
                 "SAPTZ": {
-                    "default": "The TimeZone of your SAP Server (must match HANA server's TZ)"
+                    "default": "SAP Server timezone"
                 },
                 "SAPWPconf": {
-                    "default": "Enter D for Dialog, B for Batch or M for default"
+                    "default": "SAP Autoscaling Workprocess config."
                 },
                 "SID": {
-                    "default": "Enter SAP system ID"
+                    "default": "SAP system ID"
                 },
                 "SIDadmUID": {
-                    "default": "Enter SIDadm user id (numeric value)"
+                    "default": "SIDadm user id"
                 },
                 "VPCCIDR": {
                     "default": "VPC CIDR"
                 },
                 "VolumeType": {
-                    "default": "Choose storage volume type"
+                    "default": "EBS storage volume type"
                 }
             }
         }
     },
     "Parameters": {
+        "AutoRecovery": {
+            "Type": "String",
+            "Description": "EC2 Automatic recovery feature",
+            "Default": "Yes",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
         "ASGMyInstanceType": {
             "AllowedValues": [
                 "r4.4xlarge",
@@ -263,8 +276,8 @@
             "Type": "Number"
         },
         "HANAInstallMedia": {
-            "Default": "",
-            "Description": "Full path to Amazon S3 location of SAP HANA software files (e.g., s3://mysapbucket/HANA-media/).",
+            "Default": "s3://   /",
+            "Description": "Name of your S3 bucket for your SAP HANA s/w. The s/w will *not* download if the format is not correct (e.g., s3://mysapbucket/HANA-media/).",
             "Type": "String"
         },
         "HANAInstanceType": {
@@ -446,8 +459,8 @@
             "Type": "String"
         },
         "SAPInstallMedia": {
-            "Default": "",
-            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. *Do no forget to put s3:// in the name* (i.e. s3://mysapbucket/)",
+            "Default": "s3://   /",
+            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. The s/w will *not* download if the format is not correct (i.e. s3://mysapbucket/)",
             "Type": "String"
         },
         "SAPInstanceNum": {
@@ -598,14 +611,44 @@
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-sap-hana/templates/SAP-HANA-BaseNodes.template"
                 },
                 "Parameters": {
-                    "PrivSubCIDR": {
-                        "Ref": "PrivSubCIDR"
+                    "DMZCIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1CIDR"
+                        ]
+                   },
+                    "DMZSubnet": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PublicSubnet1ID"
+                        ]
+                    },
+                    "Encryption": {
+                        "Ref": "Encryption"
+                    },
+                    "HANAInstallMedia": {
+                        "Ref": "HANAInstallMedia"
                     },
                     "HANAMasterHostname": {
                         "Ref": "SAPHANAHostname"
                     },
-                    "HANAInstallMedia": {
-                        "Ref": "HANAInstallMedia"
+                    "HANAMasterPass": {
+                        "Ref": "HANAMasterPass"
+                    },
+                    "HANASubnet": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1AID"
+                        ]
+                    },
+                    "HostCount": {
+                        "Ref": "HANAHostCount"
+                    },
+                    "InstallHANA": {
+                        "Ref": "InstallSAP"
+                    },
+                    "InstallRDPInstance": {
+                        "Ref": "InstallRDPAndBastionInstance"
                     },
                     "KeyName": {
                         "Ref": "KeyName"
@@ -619,50 +662,26 @@
                             "Code"
                         ]
                     },
-                    "InstallHANA": {
-                        "Ref": "InstallSAP"
+                    "MyInstanceType": {
+                        "Ref": "HANAInstanceType"
                     },
-                    "HostCount": {
-                        "Ref": "HANAHostCount"
-                    },
-                    "Encryption": {
-                        "Ref": "Encryption"
-                    },
-                    "VolumeType": {
-                        "Ref": "VolumeType"
+                    "PrivSubCIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1ACIDR"
+                        ]
                     },
                     "RDPInstanceType": {
                         "Ref": "RDPInstanceType"
                     },
-                    "InstallRDPInstance": {
-                        "Ref": "InstallRDPAndBastionInstance"
-                    },
-                    "MyInstanceType": {
-                        "Ref": "HANAInstanceType"
+                    "SAPInstanceNum": {
+                        "Ref": "SAPInstanceNum"
                     },
                     "SID": {
                         "Ref": "SID"
                     },
-                    "SAPInstanceNum": {
-                        "Ref": "SAPInstanceNum"
-                    },
-                    "HANAMasterPass": {
-                        "Ref": "HANAMasterPass"
-                    },
-                    "DMZCIDR": {
-                        "Ref": "PrivSubCIDR"
-                    },
-                    "HANASubnet": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PrivateSubnet1AID"
-                        ]
-                    },
-                    "DMZSubnet": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PublicSubnet1ID"
-                        ]
+                    "VolumeType": {
+                        "Ref": "VolumeType"
                     },
                     "VPCID": {
                         "Fn::GetAtt": [
@@ -688,15 +707,6 @@
                     "KeyPairName": {
                         "Ref": "KeyName"
                     },
-                    "RemoteAccessCIDR": {
-                        "Ref": "RemoteAccessCIDR"
-                    },
-                    "VPCID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.VPCID"
-                        ]
-                    },
                     "PublicSubnet1ID": {
                         "Fn::GetAtt": [
                             "VPCStack",
@@ -708,6 +718,21 @@
                             "VPCStack",
                             "Outputs.PublicSubnet2ID"
                         ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Fn::Sub": "${QSS3KeyPrefix}submodules/quickstart-linux-bastion/"
+                    },
+                    "RemoteAccessCIDR": {
+                        "Ref": "RemoteAccessCIDR"
+                    },
+                    "VPCID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.VPCID"
+                        ]
                     }
                 }
             }
@@ -717,41 +742,14 @@
             "Type": "AWS::CloudFormation::Stack",
             "Properties": {
                 "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-sap-abap/templates/sap-netweaver-abap.template"
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap.template"
                 },
                 "Parameters": {
-                    "PrivSubCIDR": {
-                        "Ref": "PrivSubCIDR"
+                    "HostCount": {
+                        "Ref": "HostCount"
                     },
-                    "SAPPASHostname": {
-                        "Ref": "SAPPASHostname"
-                    },
-                    "SAPAASHostname": {
-                        "Ref": "SAPAASHostname"
-                    },
-                    "SAPHANAHostname": {
-                        "Ref": "SAPHANAHostname"
-                    },
-                    "QSS3BucketName": {
-                        "Ref": "QSS3BucketName"
-                    },
-                    "QSS3KeyPrefix": {
-                        "Ref": "QSS3KeyPrefix"
-                    },
-                    "SAPHANAIP": {
-                        "Fn::GetAtt": [
-                            "HANAStack",
-                            "Outputs.HANAMasterInstanceIP"
-                        ]
-                    },
-                    "SAPInstallMedia": {
-                        "Ref": "SAPInstallMedia"
-                    },
-                    "KeyName": {
-                        "Ref": "KeyName"
-                    },
-                    "MyOS": {
-                        "Ref": "MyOS"
+                    "AutoRecovery": {
+                        "Ref": "AutoRecovery"
                     },
                     "InstallSAPASG": {
                         "Ref": "InstallSAPASG"
@@ -759,29 +757,14 @@
                     "InstallSAP": {
                         "Ref": "InstallSAP"
                     },
+                    "KeyName": {
+                        "Ref": "KeyName"
+                    },
                     "MyInstanceType": {
                         "Ref": "MyInstanceType"
                     },
-                    "HostCount": {
-                        "Ref": "HostCount"
-                    },
-                    "SID": {
-                        "Ref": "SID"
-                    },
-                    "SAPInstanceNum": {
-                        "Ref": "SAPInstanceNum"
-                    },
-                    "SIDadmUID": {
-                        "Ref": "SIDadmUID"
-                    },
-                    "SAPTZ": {
-                        "Ref": "SAPTZ"
-                    },
-                    "SAPPass": {
-                        "Ref": "HANAMasterPass"
-                    },
-                    "SAPMasterPass": {
-                        "Ref": "SAPMasterPass"
+                    "MyOS": {
+                        "Ref": "MyOS"
                     },
                     "PrivateSubnet1CIDR": {
                         "Fn::GetAtt": [
@@ -806,6 +789,60 @@
                             "VPCStack",
                             "Outputs.PrivateSubnet2AID"
                         ]
+                    },
+                    "PublicSubnet1CIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1ACIDR"
+                        ]
+                    },
+                    "PublicSubnet2CIDR": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet2ACIDR"
+                        ]
+                    },
+                    "QSS3BucketName": {
+                        "Ref": "QSS3BucketName"
+                    },
+                    "QSS3KeyPrefix": {
+                        "Ref": "QSS3KeyPrefix"
+                    },
+                    "SAPAASHostname": {
+                        "Ref": "SAPAASHostname"
+                    },
+                    "SAPHANAHostname": {
+                        "Ref": "SAPHANAHostname"
+                    },
+                    "SAPHANAIP": {
+                        "Fn::GetAtt": [
+                            "HANAStack",
+                            "Outputs.HANAMasterInstanceIP"
+                        ]
+                    },
+                    "SAPInstallMedia": {
+                        "Ref": "SAPInstallMedia"
+                    },
+                    "SAPPASHostname": {
+                        "Ref": "SAPPASHostname"
+                    },
+                    "SAPInstanceNum": {
+                        "Ref": "SAPInstanceNum"
+                    },
+                    "SAPMasterPass": {
+                        "Ref": "SAPMasterPass"
+                    },
+                    "SAPPass": {
+                        "Ref": "HANAMasterPass"
+                    },
+                    "SAPTZ": {
+                        "Ref": "SAPTZ"
+                    },
+                    "SID": {
+                        "Ref": "SID"
+                    },
+                    "SIDadmUID": {
+                        "Ref": "SIDadmUID"
                     },
                     "VPCID": {
                         "Fn::GetAtt": [

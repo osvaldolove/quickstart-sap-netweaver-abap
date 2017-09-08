@@ -14,7 +14,10 @@
                     "Parameters": [
                         "VPCID",
                         "DMZSubnet",
-                        "PrivSubCIDR",
+                        "PrivateSubnet1CIDR",
+                        "PrivateSubnet2CIDR",
+                        "PublicSubnet1CIDR",
+                        "PublicSubnet2CIDR",
                         "AZA",
                         "AZB",
                         "Subnets1",
@@ -60,34 +63,56 @@
                 },
                 {
                     "Label": {
-                        "default": "Optional configuration"
-                    },
-                    "Description": {
-                        "default": ""
-                    }
-                },
-                {
-                    "Label": {
                         "default": "Advanced configuration (Do not modify unless directed by AWS Support)"
                     },
                     "Description": {
                         "default": ""
                     },
-                    "Parameters": []
+                    "Parameters": [
+                        "QSS3BucketName",
+                        "QSS3KeyPrefix"
+                    ]
                 }
             ],
             "ParameterLabels": {
-                "VPCID": {
-                    "default": "Choose VPC ID"
-                },
-                "PrivSubCIDR": {
-                    "default": "Enter CIDR block for VPC"
-                },
                 "AZA": {
                     "default": "Choose 1st A.Z."
                 },
                 "AZB": {
                     "default": "Choose 2nd A.Z."
+                },
+                "PrivateSubnet2CIDR": {
+                    "default": "2nd Private Subnet CIDR"
+                },
+                "PrivateSubnet1CIDR": {
+                    "default": "1st Private Subnet CIDR"
+                },
+                "PrivateSubnet2AID": {
+                    "default": "2nd Private Subnet ID"
+                },
+                "PrivateSubnet1AID": {
+                    "default": "1st Private Subnet ID"
+                },
+                "PublicSubnet2CIDR": {
+                    "default": "2nd Public Subnet CIDR"
+                },
+                "PublicSubnet1CIDR": {
+                    "default": "1st Public Subnet CIDR"
+                },
+                "InstallSAP": {
+                    "default": "Install SAP software"
+                },
+                "MyInstanceType": {
+                    "default": "Choose instance type"
+                },
+                "MyOS": {
+                    "default": "O.S. version for SAP Servers (SLES only)"
+                },
+                "QSS3BucketName": {
+                    "default": "S3 bucket name for the Quick Start assets."
+                },
+                "QSS3KeyPrefix": {
+                    "default": "S3 key prefix for the Quick Start assets"
                 },
                 "Subnets1": {
                     "default": "Choose 1st Subnet"
@@ -98,56 +123,47 @@
                 "DMZSubnet": {
                     "default": "Choose public subnet"
                 },
-                "SnapShotID": {
-                    "default": "Enter snapshot ID"
-                },
                 "SAPPASHostname": {
-                    "default": "SAP P.A.S Server hostname"
+                    "default": "SAP P.A.S server hostname"
                 },
                 "SAPPASIP": {
-                    "default": "SAP P.A.S server I.P. address"
+                    "default": "SAP P.A.S server I.P."
                 },
                 "SAPAASHostname": {
                     "default": "SAP A.A.S Server hostname template"
                 },
                 "SAPASGHostcount": {
-                    "default": "Enter the *maximum* number of servers in the Autoscaling group"
+                    "default": "Max. number of servers in the Autoscaling group"
                 },
                 "SAPWPconf": {
-                    "default": "Enter D for Dialog, B for Batch or M for default"
+                    "default": "SAP Work process config."
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server hostname"
                 },
                 "SAPHANAIP": {
-                    "default": "SAP HANA Server I.P. address"
+                    "default": "SAP HANA Server I.P."
                 },
                 "KeyName": {
-                    "default": "Choose key pair"
-                },
-                "InstallSAP": {
-                    "default": "Install SAP software?"
-                },
-                "MyOS": {
-                    "default": "Choose operating system (currently SLES only)"
-                },
-                "MyInstanceType": {
-                    "default": "Choose instance type"
+                    "default": "SSH key pair"
                 },
                 "SID": {
-                    "default": "Enter SAP system ID"
+                    "default": "SAP system ID"
                 },
                 "SAPInstanceNum": {
-                    "default": "Enter SAP instance number"
+                    "default": "SAP instance number"
                 },
                 "SIDadmUID": {
-                    "default": "Enter SIDadm user id (numeric value)"
+                    "default": "SIDadm user id"
                 },
                 "SAPTZ": {
-                    "default": "TimeZone of your SAP Server (i.e. PT, CT, ET, default = UTC etc...)"
+                    "default": "SAP Server timezone"
                 },
                 "SAPMasterPass": {
-                    "default": "Enter name of encrypted SSM parameter store for your master password"
+                    "default": "EC2 parameter store encyrpted password"
+                },
+                "VPCID": {
+                    "default": "Choose VPC ID"
                 }
             }
         }
@@ -197,10 +213,31 @@
             "Description": "Operating system (SLES only) version for SAP servers.",
             "Type": "String"
         },
-        "PrivSubCIDR": {
+        "PrivateSubnet1CIDR": {
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
-            "Default": "10.69.0.0/16",
+            "Default": "10.0.0.0/19",
             "Description": "CIDR block of the VPC where SAP App Server Cluster will be deployed.",
+            "Type": "String"
+        },
+        "PrivateSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.32.0/19",
+            "Description": "CIDR block for private subnet 2 located in Availability Zone 2",
+            "Type": "String"
+        },
+        "PublicSubnet1CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.128.0/20",
+            "Description": "CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1",
+            "Type": "String"
+        },
+        "PublicSubnet2CIDR": {
+            "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
+            "Default": "10.0.144.0/20",
+            "Description": "CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2",
             "Type": "String"
         },
         "QSS3BucketName": {
@@ -482,7 +519,7 @@
                     {
                         "IpProtocol": "udp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": "111",
                         "ToPort": "111"
@@ -490,7 +527,7 @@
                     {
                         "IpProtocol": "udp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": "2049",
                         "ToPort": "2049"
@@ -498,7 +535,7 @@
                     {
                         "IpProtocol": "icmp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": "-1",
                         "ToPort": "-1"
@@ -506,7 +543,7 @@
                     {
                         "IpProtocol": "tcp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": {
                             "Fn::Join": [
@@ -536,7 +573,7 @@
                     {
                         "IpProtocol": "tcp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": {
                             "Fn::Join": [
@@ -566,7 +603,7 @@
                     {
                         "IpProtocol": "tcp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
                         },
                         "FromPort": "1128",
                         "ToPort": "1128"
@@ -574,7 +611,107 @@
                     {
                         "IpProtocol": "tcp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet1CIDR"
+                        },
+                        "FromPort": "1129",
+                        "ToPort": "1129"
+                    },
+                    {
+                        "IpProtocol": "udp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "111",
+                        "ToPort": "111"
+                    },
+                    {
+                        "IpProtocol": "udp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "2049",
+                        "ToPort": "2049"
+                    },
+                    {
+                        "IpProtocol": "icmp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "-1",
+                        "ToPort": "-1"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "32",
+                                    {
+                                        "Ref": "SAPInstanceNum"
+                                    },
+                                    ""
+                                ]
+                            ]
+                        },
+                        "ToPort": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "33",
+                                    {
+                                        "Ref": "SAPInstanceNum"
+                                    },
+                                    ""
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "36",
+                                    {
+                                        "Ref": "SAPInstanceNum"
+                                    },
+                                    ""
+                                ]
+                            ]
+                        },
+                        "ToPort": {
+                            "Fn::Join": [
+                                "",
+                                [
+                                    "36",
+                                    {
+                                        "Ref": "SAPInstanceNum"
+                                    },
+                                    ""
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "1128",
+                        "ToPort": "1128"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
                         },
                         "FromPort": "1129",
                         "ToPort": "1129"
@@ -582,12 +719,37 @@
                     {
                         "IpProtocol": "tcp",
                         "CidrIp": {
-                            "Ref": "PrivSubCIDR"
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "22",
+                        "ToPort": "22"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PrivateSubnet2CIDR"
+                        },
+                        "FromPort": "22",
+                        "ToPort": "22"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PublicSubnet1CIDR"
+                        },
+                        "FromPort": "22",
+                        "ToPort": "22"
+                    },
+                    {
+                        "IpProtocol": "tcp",
+                        "CidrIp": {
+                            "Ref": "PublicSubnet2CIDR"
                         },
                         "FromPort": "22",
                         "ToPort": "22"
                     }
                 ],
+
                 "SecurityGroupEgress": [
                     {
                         "IpProtocol": "-1",
@@ -856,9 +1018,11 @@
                                             },
                                             "\n",
                                             "export WaitForPASInstallWaitHandle=",
+                                            "\"",
                                             {
                                                 "Ref": "WaitForPASInstallWaitHandle"
                                             },
+                                            "\"",
                                             "\n",
                                             "export SIDadmUID=",
                                             {
