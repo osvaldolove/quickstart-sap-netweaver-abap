@@ -668,7 +668,7 @@
                     "PrivSubCIDR": {
                         "Fn::GetAtt": [
                             "VPCStack",
-                            "Outputs.PrivateSubnet1ACIDR"
+                            "Outputs.VPCCIDR"
                         ]
                     },
                     "RDPInstanceType": {
@@ -793,13 +793,13 @@
                     "PublicSubnet1CIDR": {
                         "Fn::GetAtt": [
                             "VPCStack",
-                            "Outputs.PrivateSubnet1ACIDR"
+                            "Outputs.PublicSubnet1CIDR"
                         ]
                     },
                     "PublicSubnet2CIDR": {
                         "Fn::GetAtt": [
                             "VPCStack",
-                            "Outputs.PrivateSubnet2ACIDR"
+                            "Outputs.PublicSubnet2CIDR"
                         ]
                     },
                     "QSS3BucketName": {

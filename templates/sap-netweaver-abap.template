@@ -1158,9 +1158,18 @@
                                         ]
                                     ]
                                 },
-                                "mode": "000400",
+                                "mode": "000500",
                                 "owner": "root",
                                 "group": "root"
+                            },
+                            "/root/install/create-attach-single-volume.sh": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/create-attach-single-volume.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
                             },
                             "/root/install/download-sapapp.sh": {
                                 "source": {
@@ -1170,12 +1179,33 @@
                                 "owner": "root",
                                 "group": "root",
                                 "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/signalFinalStatus.sh": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/signalFinalStatus.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/sap-app-pas-install-single-hosts.sh" : {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-pas-install-single-hosts.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
                             }
                         },
-                        "commands": {
-                        }
-                    }
-                }
+                                "commands" : {
+                            "startinstall" : {
+                                 "command" : "bash -xv /root/install/download-sapapp.sh"
+                                             }
+                                 }
+                          }
+                   }
             },
             "Properties": {
                 "BlockDeviceMappings": [
@@ -1280,20 +1310,6 @@
                                 {
                                     "Ref": "AWS::Region"
                                 },
-                                "\n",
-                                "sleep 30",
-                                "\n",
-                                "sh -xv /root/install/download-sapapp.sh -b ",
-                                {
-                                    "Ref": "QSS3BucketName"
-                                },
-                                "\n",
-                                "/opt/aws/bin/cfn-signal -e $? ",
-                                "\"",
-                                {
-                                    "Ref": "WaitForPASInstallWaitHandle"
-                                },
-                                "\"",
                                 "\n"
                             ]
                         ]

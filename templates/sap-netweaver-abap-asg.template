@@ -909,13 +909,13 @@
         "CPUAlarmHigh": {
             "Type": "AWS::CloudWatch::Alarm",
             "Properties": {
-                "AlarmDescription": "Scale-up if CPU > 50% for 1 minutes",
+                "AlarmDescription": "Scale-up if CPU > 65% for 1 minutes",
                 "MetricName": "CPUUtilization",
                 "Namespace": "AWS/EC2",
                 "Statistic": "Average",
                 "Period": "60",
                 "EvaluationPeriods": "1",
-                "Threshold": "50",
+                "Threshold": "65",
                 "AlarmActions": [
                     {
                         "Ref": "ScaleUpPolicy"
@@ -1041,6 +1041,24 @@
                                 "owner": "root",
                                 "group": "root"
                             },
+                            "/root/install/create-attach-single-volume.sh": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/create-attach-single-volume.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/signalFinalStatus.sh": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/signalFinalStatus.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
                             "/root/install/sap-app-aas-install-ASG-dnl.sh": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install-ASG-dnl.sh"
@@ -1049,12 +1067,24 @@
                                 "owner": "root",
                                 "group": "root",
                                 "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/sap-app-aas-install-ASG.sh": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install-ASG.sh"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
                             }
                         },
-                        "commands": {
-                        }
-                    }
-                }
+                                "commands" : {
+                            "startinstall" : {
+                                 "command" : "bash -xv /root/install/sap-app-aas-install-ASG-dnl.sh"
+                                             }
+                                 }
+                          }
+                   }
             },
             "Properties": {
                 "InstanceType": {
@@ -1124,20 +1154,6 @@
                                 {
                                     "Ref": "AWS::Region"
                                 },
-                                "\n",
-                                "sleep 15",
-                                "\n",
-                                "sh -xv  /root/install/sap-app-aas-install-ASG-dnl.sh -b ",
-                                {
-                                    "Ref": "QSS3BucketName"
-                                },
-                                "\n",
-                                "/opt/aws/bin/cfn-signal -e $? ",
-                                "\"",
-                                {
-                                    "Ref": "WaitForPASInstallWaitHandle"
-                                },
-                                "\"",
                                 "\n"
                             ]
                         ]
