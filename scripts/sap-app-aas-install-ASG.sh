@@ -1038,9 +1038,14 @@ HOSTNAME=$(cat /tmp/HOSTNAME)
 su - $SIDADM -c "stopsap $HOSTNAME"
 su - $SIDADM -c "startsap $HOSTNAME"
 
-_SAP_UP=$(ps -ef | grep D | grep sap | grep -v grep)
+sleep 15
 
-if [ -n "$_SAP_UP" ]
+#test if SAP is up
+_SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
+
+echo "This is the value of SAP_UP: $_SAP_UP"
+
+if [ "$_SAP_UP" -eq 1 ]
 then
 	echo "Successfully installed SAP"
 	set_cleanup_temp_PAS
@@ -1052,6 +1057,7 @@ then
 	touch /etc/sap-app-quickstart
 	exit
 else
+	echo "SAP installed FAILED."
 	set_cleanup_temp_PAS
 	set_cleanup_aasinifile
 	#signal the waithandler, 0=Success

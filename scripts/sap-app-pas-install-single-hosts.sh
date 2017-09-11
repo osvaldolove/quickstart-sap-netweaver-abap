@@ -653,10 +653,13 @@ sleep 5
 su - "$SIDADM" -c "startsap"
 sleep 5
 
-_SAP_UP=$(ps -ef | grep ASCS | grep -v grep | wc -l)
+#test if SAP is up
+_SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
+
+echo "This is the value of SAP_UP: $_SAP_UP"
 
 
-if [ "$_SAP_UP" -ge 1 ]
+if [ "$_SAP_UP" -eq 1 ]
 then
      echo "Successfully installed SAP"
 
@@ -751,9 +754,12 @@ sleep 5
 
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
-_SAP_UP=$(ps -ef | grep DVEB | grep -v grep)
+#test if SAP is up
+_SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
 
-if [ "$_SAP_UP" ]
+echo "This is the value of SAP_UP: $_SAP_UP"
+
+if [ "$_SAP_UP" -eq 1 ]
 then
 	echo "Successfully installed SAP"
 	#create the PAS done file
@@ -776,9 +782,12 @@ else
 
 	./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
-	_SAP_UP=$(ps -ef | grep DVEB | grep -v grep)
+	#test if SAP is up
+	_SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
 
-	if [ "$_SAP_UP" ]
+	echo "This is the value of SAP_UP: $_SAP_UP"
+
+	if [ "$_SAP_UP" -eq 1 ]
 	then
 		#create the PAS done file
 		touch "$PAS_DONE"
