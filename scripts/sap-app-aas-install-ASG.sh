@@ -239,9 +239,9 @@ set_filesystems() {
 
 	if [ -z "$USR_SAP_VOLUME" ]
 	then
-		echo "Exiting, can not create $USR_SAP_DEVICE or $SAPMNT_DEVICE EBS volues"
+		echo "Exiting, can not create $USR_SAP_DEVICE or $SAPMNT_DEVICE EBS volumes"
 	        #signal the waithandler, 1=Failed
-	        /root/install/signalFinalStatus.sh 1
+	        /root/install/signalFinalStatus.sh 1 "Exiting, can not create $USR_SAP_DEVICE or $SAPMNT_DEVICE EBS volumes"
 	        set_cleanup_aasinifile
 		exit 1
 	else
@@ -411,18 +411,18 @@ set_perm_ssm() {
 
 	        #need to make sure the SND_BAK is successful before proceeding
 	        RETRY_COUNT=0
-       		RETRY_TIMES=10
+       		RETRY_TIMES=5
 
         	while [ "$_SND_STAT_BAK" -lt 1 ]
         	do	
-                	#retry 10 times then hard exit with failure
+                	#retry x times then hard exit with failure
                 	if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
                 	then
                         	#signal failure and do not proceed
                         	set_cleanup_temp_PAS
                         	set_cleanup_aasinifile
                         	#signal the waithandler, 1=Failure
-                        	/root/install/signalFinalStatus.sh 1
+                        	/root/install/signalFinalStatus.sh 1 "set_perm_ssm function...COPY Backup host file Failed...retry x times then hard exit with failure"
 				echo 1
                         	exit 1
                 	else
@@ -450,14 +450,14 @@ set_perm_ssm() {
 
                 while [ "$_SND_STAT" -lt 1 ]
                 do 
-                        #retry 10 times then hard exit with failure
+                        #retry x times then hard exit with failure
                         if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
                         then
                                 #signal failure and do not proceed
                                 set_cleanup_temp_PAS
                                 set_cleanup_aasinifile
                                 #signal the waithandler, 1=Failure
-                                /root/install/signalFinalStatus.sh 1
+                        	/root/install/signalFinalStatus.sh 1 "set_perm_ssm function...Update PAS host file Failed...retry x times then hard exit with failure"
                                 exit 1
                         else
 				_SND_PAS=$(aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "copy_hosts" --parameters commands="cp "$SW_TARGET/hosts.new" "$HOSTS_FILE"" --query '*."CommandId"' --region $REGION --output text)
@@ -696,7 +696,7 @@ set_dist_hosts() {
 
 	#need to make sure the SND_PAS is successful before proceeding
 	RETRY_COUNT=0
-	RETRY_TIMES=10
+	RETRY_TIMES=5
 
        	while [ "$_SND_STAT" -lt 1 ]
  	do	
@@ -707,7 +707,7 @@ set_dist_hosts() {
 		        set_cleanup_temp_PAS
         		set_cleanup_aasinifile
         		#signal the waithandler, 1=Failure
-        		/root/install/signalFinalStatus.sh 1
+                        /root/install/signalFinalStatus.sh 1 "set_dist_hosts function...SND_PAS host file Failed...retry x times then hard exit with failure"
 			echo 1
 			exit 1
 		else
@@ -738,18 +738,18 @@ set_dist_hosts() {
 			_SND_NSCD=$(aws ssm send-command --instance-ids  $MYEC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart" --query '*."CommandId"' --region $REGION --output text)
 
 			RETRY_COUNT=0
-			RETRY_TIMES=10
+			RETRY_TIMES=x
 
 			while [ "$_SND_STAT" -lt 1 ]
 		 	do	
-				#retry 10 times then hard exit with failure	
+				#retry x times then hard exit with failure	
 				if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
 				then
 					#signal failure and do not proceed		
 		        		set_cleanup_temp_PAS
         				set_cleanup_aasinifile
         				#signal the waithandler, 1=Failure
-        				/root/install/signalFinalStatus.sh 1
+                        		/root/install/signalFinalStatus.sh 1 "set_dist_hosts function...Update ALL_IPs host file Failed...retry x times then hard exit with failure"
 					exit 1
 				else
 					_SND=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "copy_hosts_file" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.pas" --query '*."CommandId"' --region $REGION --output text)
@@ -834,7 +834,7 @@ then
         then
                 echo "No Internet Connectivity...Please terminate this EC2 instance or resolve the connection issue."
 		#signal the waithandler, 1=Failed
-		/root/install/signalFinalStatus.sh 1
+                /root/install/signalFinalStatus.sh 1 "Internet connectivity failed"
 		set_cleanup_aasinifile
                 exit 1
         fi
@@ -849,7 +849,7 @@ then
 else
 	echo "FAILED to install AWS CLI...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to install AWS CLI...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -865,7 +865,7 @@ then
 else
 	echo "FAILED to install SSM...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to install ssm...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -878,7 +878,7 @@ if [ "$INVALID_MP" == "INVALIDPARAMETERS" ]
 then
 	echo "Invalid encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Invalid SSM Parameter Store...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -887,7 +887,7 @@ if [ -z "$MP" ]
 then
 	echo "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -901,7 +901,7 @@ then
 else
 	echo "FAILED to install UUIDD...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to install UUIDD...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -915,7 +915,7 @@ then
 else
 	echo "FAILED to update TimeZone...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to update TimeZone...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -928,7 +928,7 @@ then
 else
 	echo "FAILED to update NTP...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to update NTP...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -945,7 +945,7 @@ then
 else
 	echo "FAILED to update $USR_SAP filesystem...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "FAILED to  update $USR_SAP filesystem...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -973,7 +973,7 @@ else
 		then
 			echo "Failed to mount $SAPMNT, tried $COUNT times...exiting"
 			#signal the waithandler, 1=Failed
-			/root/install/signalFinalStatus.sh 1
+        		/root/install/signalFinalStatus.sh 1 "Failed to mount $SAPMNT, tried $COUNT times...exiting"
 			set_cleanup_aasinifile
 			exit 1
 		fi
@@ -990,7 +990,7 @@ then
 else
 	echo "FAILED to set hostname"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Failed to set hostname"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -1003,7 +1003,7 @@ then
 else
 	echo "FAILED to install AWS Data Provider...exiting"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Failed to install AWS Data Provider...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -1018,7 +1018,7 @@ if [ ! -f "$INI_FILE" ]
 then
 	echo "Exiting script...no INI FILE...$INI_FILE"
 	#signal the waithandler, 1=Failed
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Exiting script...no INI FILE...$INI_FILE"
 	set_cleanup_aasinifile
 	exit 1
 fi
@@ -1052,7 +1052,7 @@ then
 	set_cleanup_aasinifile
 	set_dist_hosts
 	#signal the waithandler, 0=Success
-	/root/install/signalFinalStatus.sh 0
+        /root/install/signalFinalStatus.sh 0 "Successfully installed SAP. SAP_UP value is: $_SAP_UP"
 	#create the /etc/sap-app-quickstart file
 	touch /etc/sap-app-quickstart
 	exit
@@ -1061,5 +1061,5 @@ else
 	set_cleanup_temp_PAS
 	set_cleanup_aasinifile
 	#signal the waithandler, 0=Success
-	/root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Failed to installed SAP. SAP_UP value is: $_SAP_UP"
 fi

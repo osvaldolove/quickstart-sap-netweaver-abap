@@ -273,7 +273,7 @@ set_filesystems() {
     then
         echo "Exiting, can not create $USR_SAP_DEVICE or $SAPMNT_DEVICE EBS volues" 
         #signal the waithandler, 1=Failed
-        /root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "Exiting, can not create $USR_SAP_DEVICE or $SAPMNT_DEVICE EBS volues"
         set_cleanup_inifiles
         exit 1
     else
@@ -468,7 +468,7 @@ _PIPVAL=$(rpm -qa | grep python-pip |wc -l)
 if [ "$_PIPVAL" -ne 1 ]
 then
 	echo "**AWS CLI not updated correctly...EXITING**"
-        /root/install/signalFinalStatus.sh 1
+        /root/install/signalFinalStatus.sh 1 "**AWS CLI not updated correctly...EXITING**"
 	exit 1
 
 fi
@@ -511,7 +511,7 @@ then
      fi
 else 
      echo "FAILED, to install uuidd...exiting..."
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED, to install uuidd...exiting..."
      exit
 fi
 
@@ -525,7 +525,7 @@ then
      echo "Success, current TZ = $_CURRENT_TZ"
 else
      echo "FAILED, current TZ = $_CURRENT_TZ"
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED, current TZ = $_CURRENT_TZ"
      exit
 fi
 
@@ -536,7 +536,7 @@ then
      echo "Successfully installed AWS Data Provider"
 else
      echo "FAILED to install AWS Data Provider...exiting"
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED to install AWS Data Provider...exiting"
      exit
 fi
 
@@ -549,7 +549,7 @@ then
      echo "Successfully set NTP"
 else
      echo "FAILED to set NTP "
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED to set NTP"
      exit
 fi
 
@@ -571,7 +571,7 @@ else
      		echo "FAILED to set /usr/sap and /sapmnt..."
      		echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket: $S3_BUCKET"
      		#signal the waithandler, 1=Failed
-     		/root/install/signalFinalStatus.sh 1
+     		/root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket: $S3_BUCKET"
      		set_cleanup_inifiles
      		exit
 	fi
@@ -587,7 +587,7 @@ then
      echo "Successfully set and updated hostname"
 else
      echo "FAILED to set hostname"
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED to set hostname"
      exit
 fi
 
@@ -603,7 +603,7 @@ then
      echo "Successfully exported NFS file(s)"
 else
      echo "FAILED to export NFS file(s)"
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED to export NFS file(s)"
      exit
 fi
 
@@ -624,7 +624,7 @@ then
 	echo "Completed setting up SAP App Server Infrastrucure."
 	echo "Exiting as the option to install SAP software was set to: $INSTALL_SAP"
 	#signal the waithandler, 0=Success
-	/root/install/signalFinalStatus.sh 0
+	/root/install/signalFinalStatus.sh 0 "Finished. Exiting as the option to install SAP software was set to: $INSTALL_SAP"
         exit 0
 fi
 
@@ -713,7 +713,7 @@ else
      else
           echo "DB not installed."
           set_cleanup_inifiles
-          /root/install/signalFinalStatus.sh 1
+          /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
           exit 1
      fi
 fi
@@ -728,7 +728,7 @@ then
 
     echo "$ASCS_DONE file does not exist...exiting"
     set_cleanup_inifiles
-    /root/install/signalFinalStatus.sh 1
+    /root/install/signalFinalStatus.sh 1 "ASCS_DONE file $ASCS_DONE does not exist...exiting"
     exit 1
 fi
 
@@ -743,7 +743,7 @@ then
 else
      echo  "FAILED to set services file"
      set_cleanup_inifiles
-     /root/install/signalFinalStatus.sh 1
+     /root/install/signalFinalStatus.sh 1 "FAILED to set services file"
      exit 1
 fi
 
@@ -765,7 +765,7 @@ then
 	#create the PAS done file
 	touch "$PAS_DONE"
 	#signal the waithandler, 0=Success
-	/root/install/signalFinalStatus.sh 0
+	/root/install/signalFinalStatus.sh 0 "Successfully installed SAP. First try..."
         set_cleanup_inifiles
 	#create the /etc/sap-app-quickstart file
 	touch /etc/sap-app-quickstart
@@ -792,7 +792,7 @@ else
 		#create the PAS done file
 		touch "$PAS_DONE"
 		#signal the waithandler, 0=Success
-		/root/install/signalFinalStatus.sh 0
+		/root/install/signalFinalStatus.sh 0 "SAP successfully install...after RETRY"
                 set_cleanup_inifiles
 		#create the /etc/sap-app-quickstart file
 		touch /etc/sap-app-quickstart
@@ -801,7 +801,7 @@ else
         else
 		echo "SAP PAS failed to install...exiting"
 		#signal the waithandler, 1=Failed
-		/root/install/signalFinalStatus.sh 1
+		/root/install/signalFinalStatus.sh 1 "SAP PAS failed to install...exiting"
                 set_cleanup_inifiles
 		exit
        fi

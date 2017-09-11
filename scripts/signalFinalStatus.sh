@@ -45,19 +45,25 @@ set_install_cfn() {
 # ------------------------------------------------------------------
 
 
-[[ $# -ne 1 ]] && usage;
+[[ $# -ne 2 ]] && usage;
 
-set_install_cfn
+
+if [ ! -L /opt/aws ]
+then
+        set_install_cfn
+fi
+
 export PYTHONPATH=/opt/aws:$PYTHONPATH
 
-SIGNAL=$*
+SIGNAL="$1"
+MSG="$2"
 
 log `date` signalFinalStatus.sh
 
 if [ "${SIGNAL}" == "0" ]; then
-   /opt/aws/bin/cfn-signal -e 0 -r "SAP Install Success." "${WaitForPASInstallWaitHandle}"
+   /opt/aws/bin/cfn-signal -e "$SIGNAL" -r "$MSG" "${WaitForPASInstallWaitHandle}"
 else
-   /opt/aws/bin/cfn-signal -e 1 -r "SAP Install Failed."  "${WaitForPASInstallWaitHandle}"
+   /opt/aws/bin/cfn-signal -e "$SIGNAL" -r "$MSG" "${WaitForPASInstallWaitHandle}"
 fi
 
 log `date` END signalFinalStatus.sh
