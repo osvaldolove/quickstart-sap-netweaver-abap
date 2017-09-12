@@ -713,10 +713,12 @@ else
      else
           echo "DB not installed."
           set_cleanup_inifiles
-          /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
+          #/root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
 	  #save logs to s3 bucket
-	  aws s3 cp /root/install  s3://quickstart-ci-reports/develop/"$REGION" --recursive
-	  aws s3 cp /var/log       s3://quickstart-ci-reports/develop/"$REGION" --recursive
+	  aws s3 cp /root/install  s3://quickstart-ci-reports/develop/"$REGION" --recursive > /tmp/out-install 2>&1
+	  aws s3 cp /var/log       s3://quickstart-ci-reports/develop/"$REGION" --recursive > /tmp/out-log 2>&1
+	  LOG_MSG=$(cat /tmp/out-install /tmp/out-log)
+          /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed: "$LOG_MSG" "
           exit 1
      fi
 fi
