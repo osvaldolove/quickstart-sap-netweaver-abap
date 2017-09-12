@@ -13,7 +13,7 @@
     },
     {
         "ParameterKey": "SAPMasterPass",
-        "ParameterValue": "$[taskcat_genpass_10]"
+        "ParameterValue": "pass-ssm-store"
     },
     {
         "ParameterKey": "BASTIONInstanceType",
