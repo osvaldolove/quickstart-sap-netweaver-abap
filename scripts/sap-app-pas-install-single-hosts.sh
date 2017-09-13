@@ -817,7 +817,7 @@ else
 		echo "SAP PAS failed to install...exiting"
 		#signal the waithandler, 1=Failed
 	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail2-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail1-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
+	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail2-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 		/root/install/signalFinalStatus.sh 1 "SAP PAS failed to install...exiting"
                 set_cleanup_inifiles
 		exit
