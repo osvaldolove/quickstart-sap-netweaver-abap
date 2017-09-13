@@ -263,7 +263,7 @@ set_filesystems() {
 
     #create and attach EBS volumes for /usr/sap and /sapmnt
 
-    aws s3 cp /var/log/messages  s3://quickstart-ci-reports/develop/"$REGION"/start_set_fs --recursive > /tmp/out-install 2>&1
+    aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start_set_fs --recursive  --acl public-read > /tmp/out-install 2>&1
     bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
     bash /root/install/create-attach-single-volume.sh "100:gp2:$SAPMNT_DEVICE:$SAPMNT" > /dev/null
 
@@ -475,7 +475,7 @@ then
 fi
 
 #test copy some logs
-aws s3 cp /var/log/messages  s3://quickstart-ci-reports/develop/"$REGION"/somckitk --recursive > /tmp/out-install 2>&1
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-script --recursive  --acl public-read > /tmp/out-install 2>&1
 
 #recreat the SSM param store as encrypted
 _MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
@@ -486,7 +486,7 @@ while [ "$_MPVAL" -eq 0 -a "$_MPINV" -eq 0 ]
 do
 	echo "Waiting for SSM parameter store: $SSM_PARAM_STORE @ $(date)..."
 	_MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
-	aws s3 cp /var/log/messages  s3://quickstart-ci-reports/develop/"$REGION"/ssm --recursive > /tmp/out-install 2>&1
+	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm --recursive  --acl public-read > /tmp/out-install 2>&1
 	sleep 15
 done
 
@@ -720,8 +720,8 @@ else
           set_cleanup_inifiles
           #/root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
 	  #save logs to s3 bucket
-	  aws s3 cp /root/install  s3://quickstart-ci-reports/develop/"$REGION" --recursive > /tmp/out-install 2>&1
-	  aws s3 cp /var/log       s3://quickstart-ci-reports/develop/"$REGION" --recursive > /tmp/out-log 2>&1
+	  aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail1-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	  aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail1-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	  LOG_MSG=$(cat /tmp/out-install /tmp/out-log)
           /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed: "$LOG_MSG" "
           exit 1
@@ -808,9 +808,13 @@ else
 		touch /etc/sap-app-quickstart
 		chmod 1777 /tmp
 		mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket
+	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/success-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/success-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
         else
 		echo "SAP PAS failed to install...exiting"
 		#signal the waithandler, 1=Failed
+	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail2-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail1-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 		/root/install/signalFinalStatus.sh 1 "SAP PAS failed to install...exiting"
                 set_cleanup_inifiles
 		exit
