@@ -488,8 +488,8 @@ while [ "$_MPVAL" -eq 0 -a "$_MPINV" -eq 0 ]
 do
 	echo "Waiting for SSM parameter store: $SSM_PARAM_STORE @ $(date)..."
 	_MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
-	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/ssm-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
+	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm-loop-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/ssm-loop-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	sleep 15
 done
 
@@ -648,6 +648,9 @@ SIDADM=$(echo $SID\adm)
 
 #Install the ASCS and DB Instances
 
+#Prior to start of install...copy some logs
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-main-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 umask 006
 
 cd $SAPINST
