@@ -263,7 +263,8 @@ set_filesystems() {
 
     #create and attach EBS volumes for /usr/sap and /sapmnt
 
-    aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start_set_fs --recursive  --acl public-read > /tmp/out-install 2>&1
+    aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start_set_fs-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+    aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start_set_fs-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
     bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
     bash /root/install/create-attach-single-volume.sh "100:gp2:$SAPMNT_DEVICE:$SAPMNT" > /dev/null
 
@@ -475,7 +476,8 @@ then
 fi
 
 #test copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-script --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-script-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-main-script-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 
 #recreat the SSM param store as encrypted
 _MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
@@ -486,7 +488,8 @@ while [ "$_MPVAL" -eq 0 -a "$_MPINV" -eq 0 ]
 do
 	echo "Waiting for SSM parameter store: $SSM_PARAM_STORE @ $(date)..."
 	_MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
-	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm --recursive  --acl public-read > /tmp/out-install 2>&1
+	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/ssm-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	sleep 15
 done
 
