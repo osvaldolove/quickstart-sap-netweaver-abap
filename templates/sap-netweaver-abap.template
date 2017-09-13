@@ -1018,6 +1018,7 @@
                                     "Effect": "Allow",
                                     "Action": [
                                         "s3:GetObject",
+                                        "s3:Put*",
                                         "s3:ListBucket",
                                         "ec2:Describe*",
                                         "ec2:AttachNetworkInterface",
