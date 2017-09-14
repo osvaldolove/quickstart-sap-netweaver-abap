@@ -1082,7 +1082,7 @@
                 "Handle": {
                     "Ref": "WaitForPASInstallWaitHandle"
                 },
-                "Timeout": "43200"
+                "Timeout": "14400"
             }
         },
         "WaitForPASInstallWaitHandle": {
