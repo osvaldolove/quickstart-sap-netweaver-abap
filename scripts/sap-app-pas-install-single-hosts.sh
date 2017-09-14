@@ -101,6 +101,9 @@ set_install_ssm() {
 	chmod 755 /etc/init.d/ssm
 
 	chkconfig ssm on
+
+        aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/logs-from-ssm-function-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+        aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/logs-from-ssm-function-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 }
 
 set_dbinifile() {
@@ -476,8 +479,8 @@ then
 fi
 
 #test copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-script-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-main-script-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-before-ssm-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-before-ssm-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 
 #recreat the SSM param store as encrypted
 _MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
@@ -596,6 +599,8 @@ then
 else
      echo "FAILED to set hostname"
      /root/install/signalFinalStatus.sh 1 "FAILED to set hostname"
+     aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail-set-hostname-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail-set-hostname-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      exit
 fi
 
@@ -612,6 +617,8 @@ then
 else
      echo "FAILED to export NFS file(s)"
      /root/install/signalFinalStatus.sh 1 "FAILED to export NFS file(s)"
+     aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail-nfs-exp-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail-nfs-exp-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      exit
 fi
 
@@ -649,8 +656,8 @@ SIDADM=$(echo $SID\adm)
 #Install the ASCS and DB Instances
 
 #Prior to start of install...copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-main-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-main-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-before-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-before-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 umask 006
 
 cd $SAPINST
