@@ -330,7 +330,7 @@
             "Type": "String"
         },
         "SAPInstanceNum": {
-            "AllowedPattern": "([0-9]{1}[0-7]{1})",
+            "AllowedPattern": "([0-8]{1}[0-9]{1}|[9]{1}[0-7]{1})",
             "Default": "00",
             "Description": "SAP instance number to use for installation and setup, and to open ports for security groups.",
             "Type": "String"
@@ -1176,6 +1176,42 @@
                                 "mode": "000500",
                                 "owner": "root",
                                 "group": "root"
+                            },
+                            "/root/install/APPX_D00_Linux_HDB.params": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/APPX_D00_Linux_HDB.params"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/ASCS_00_Linux_HDB.params": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/ASCS_00_Linux_HDB.params"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/DB_00_Linux_HDB.params": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/DB_00_Linux_HDB.params"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
+                            },
+                            "/root/install/PASX_D00_Linux_HDB.params": {
+                                "source": {
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/PASX_D00_Linux_HDB.params"
+                                },
+                                "mode": "000500",
+                                "owner": "root",
+                                "group": "root",
+                                "authentication": "S3AccessCreds"
                             },
                             "/root/install/create-attach-single-volume.sh": {
                                 "source": {

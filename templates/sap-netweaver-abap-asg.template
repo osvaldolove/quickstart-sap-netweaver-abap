@@ -277,7 +277,7 @@
             "Type": "String"
         },
         "SAPInstanceNum": {
-            "AllowedPattern": "([0-9]{1}[0-7]{1})",
+            "AllowedPattern": "([0-8]{1}[0-9]{1}|[9]{1}[0-7]{1})",
             "Default": "00",
             "Description": "SAP instance number to use for installation and setup, and to open ports for security groups.",
             "Type": "String"
