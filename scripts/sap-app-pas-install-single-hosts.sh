@@ -308,9 +308,12 @@ set_filesystems() {
           
           #download the media from the S3 bucket provided
           aws s3 sync $S3_BUCKET $SW_TARGET > /dev/null
+	  cp /root/install/*.params "$SW_TARGET"
+
           if [ -d "$SAPINST" ]
           then
               chmod -R 755 $SW_TARGET > /dev/null 
+	      cp /root/install/*.params "$SW_TARGET"
               echo 0
           else
 	      #retry the download again
@@ -318,6 +321,7 @@ set_filesystems() {
  	      if [ -d "$SAPINST" ]
 	      then
               	   chmod -R 755 $SW_TARGET > /dev/null 
+	           cp /root/install/*.params "$SW_TARGET"
                    echo 0
               else
                    echo 1
@@ -665,6 +669,9 @@ sleep 5
 echo "Installing the ASCS instance...(1st try)"
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
+#After start of install...copy some logs
+aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/after1-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/after1-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 
 su - "$SIDADM" -c "stopsap"
 sleep 5
@@ -689,6 +696,9 @@ then
      echo
      echo "Proceeding with database installation...(1st try)"
      cd $SAPINST
+     #Prior to start of install...copy some logs
+     aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start1-before-db-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start1-before-db-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
   
      DB_DONE=$(su - "$SIDADM" -c "R3trans -d" | grep "R3trans finished (0000)")
@@ -717,6 +727,9 @@ else
      cd /tmp
      rm -rf sap*
      cd $SAPINST
+     #Prior to start of install...copy some logs
+     aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start2-before-db-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start2-before-db-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      echo "Proceeding with database installation...(2nd try)"
      ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
      
