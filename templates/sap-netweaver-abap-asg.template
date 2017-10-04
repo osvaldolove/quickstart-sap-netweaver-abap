@@ -57,7 +57,7 @@
                         "SIDadmUID",
                         "SAPInstanceNum",
                         "SAPTZ",
-                        "SAPMasterPass",
+                        "SAPNetweaverPassSSMParam",
                         "InstallSAP"
                     ]
                 },
@@ -81,26 +81,14 @@
                 "AZB": {
                     "default": "Choose 2nd A.Z."
                 },
-                "PrivateSubnet2CIDR": {
-                    "default": "2nd Private Subnet CIDR"
-                },
-                "PrivateSubnet1CIDR": {
-                    "default": "1st Private Subnet CIDR"
-                },
-                "PrivateSubnet2AID": {
-                    "default": "2nd Private Subnet ID"
-                },
-                "PrivateSubnet1AID": {
-                    "default": "1st Private Subnet ID"
-                },
-                "PublicSubnet2CIDR": {
-                    "default": "2nd Public Subnet CIDR"
-                },
-                "PublicSubnet1CIDR": {
-                    "default": "1st Public Subnet CIDR"
+                "DMZSubnet": {
+                    "default": "Choose public subnet"
                 },
                 "InstallSAP": {
                     "default": "Install SAP software"
+                },
+                "KeyName": {
+                    "default": "SSH key pair"
                 },
                 "MyInstanceType": {
                     "default": "Choose instance type"
@@ -108,26 +96,29 @@
                 "MyOS": {
                     "default": "O.S. version for SAP Servers (SLES only)"
                 },
+                "PrivateSubnet1AID": {
+                    "default": "1st Private Subnet ID"
+                },
+                "PrivateSubnet1CIDR": {
+                    "default": "1st Private Subnet CIDR"
+                },
+                "PrivateSubnet2AID": {
+                    "default": "2nd Private Subnet ID"
+                },
+                "PrivateSubnet2CIDR": {
+                    "default": "2nd Private Subnet CIDR"
+                },
+                "PublicSubnet1CIDR": {
+                    "default": "1st Public Subnet CIDR"
+                },
+                "PublicSubnet2CIDR": {
+                    "default": "2nd Public Subnet CIDR"
+                },
                 "QSS3BucketName": {
                     "default": "S3 bucket name for the Quick Start assets."
                 },
                 "QSS3KeyPrefix": {
                     "default": "S3 key prefix for the Quick Start assets"
-                },
-                "Subnets1": {
-                    "default": "Choose 1st Subnet"
-                },
-                "Subnets2": {
-                    "default": "Choose 2nd Subnet"
-                },
-                "DMZSubnet": {
-                    "default": "Choose public subnet"
-                },
-                "SAPPASHostname": {
-                    "default": "SAP P.A.S server hostname"
-                },
-                "SAPPASIP": {
-                    "default": "SAP P.A.S server I.P."
                 },
                 "SAPAASHostname": {
                     "default": "SAP A.A.S Server hostname template"
@@ -135,32 +126,41 @@
                 "SAPASGHostcount": {
                     "default": "Max. number of servers in the Autoscaling group"
                 },
-                "SAPWPconf": {
-                    "default": "SAP Work process config."
-                },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server hostname"
                 },
                 "SAPHANAIP": {
                     "default": "SAP HANA Server I.P."
                 },
-                "KeyName": {
-                    "default": "SSH key pair"
-                },
-                "SID": {
-                    "default": "SAP system ID"
-                },
                 "SAPInstanceNum": {
                     "default": "SAP instance number"
                 },
-                "SIDadmUID": {
-                    "default": "SIDadm user id"
+                "SAPNetweaverPassSSMParam": {
+                    "default": "EC2 parameter store encyrpted password"
+                },
+                "SAPPASHostname": {
+                    "default": "SAP P.A.S server hostname"
+                },
+                "SAPPASIP": {
+                    "default": "SAP P.A.S server I.P."
                 },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
                 },
-                "SAPMasterPass": {
-                    "default": "EC2 parameter store encyrpted password"
+                "SAPWPconf": {
+                    "default": "SAP Work process config."
+                },
+                "SID": {
+                    "default": "SAP system ID"
+                },
+                "SIDadmUID": {
+                    "default": "SIDadm user id"
+                },
+                "Subnets1": {
+                    "default": "Choose 1st Subnet"
+                },
+                "Subnets2": {
+                    "default": "Choose 2nd Subnet"
                 },
                 "VPCID": {
                     "default": "Choose VPC ID"
@@ -282,7 +282,7 @@
             "Description": "SAP instance number to use for installation and setup, and to open ports for security groups.",
             "Type": "String"
         },
-        "SAPMasterPass": {
+        "SAPNetweaverPassSSMParam": {
             "AllowedPattern": "^(?!ssm).*$",
             "ConstraintDescription": "Name of SSM param store can *not* begin with ssm.",
             "Description": "Name can *not* start with ssm. We store the encrypted master password in the EC2 SSM Parameter Store",
@@ -974,7 +974,7 @@
                                             "\n",
                                             "export SSM_PARAM_STORE=",
                                             {
-                                                "Ref": "SAPMasterPass"
+                                                "Ref": "SAPNetweaverPassSSMParam"
                                             },
                                             "\n",
                                             "export TZ_INPUT_PARAM=",

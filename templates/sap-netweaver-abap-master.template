@@ -56,7 +56,6 @@
                         "SAPInstanceNum",
                         "SIDadmUID",
                         "SAPTZ",
-                        "SAPMasterPass",
                         "SAPInstallMedia",
                         "InstallSAP"
                     ]
@@ -186,9 +185,6 @@
                 },
                 "SAPInstanceNum": {
                     "default": "SAP instance number"
-                },
-                "SAPMasterPass": {
-                    "default": "Name of SSM parameter store for master password"
                 },
                 "SAPPASHostname": {
                     "default": "SAP P.A.S. Server host name (i.e. sappas00)"
@@ -469,14 +465,6 @@
             "Description": "SAP instance number to use for installation and setup, and to open ports for security groups.",
             "Type": "String"
         },
-        "SAPMasterPass": {
-                "AllowedPattern": "^(?!ssm).*$",
-                "ConstraintDescription": "Name of SSM param store can *not* begin with ssm.",
-                "Description": "Name can *not* start with ssm. We store the encrypted master password in the EC2 SSM Parameter Store",
-                "MinLength": "1",
-                "NoEcho": "false",
-                "Type": "String"
-            },
         "SAPPASHostname": {
             "Default": "sappas00",
             "Description": "Host name to use for SAP P.A.S Server (DNS short name).",
@@ -828,9 +816,6 @@
                     },
                     "SAPInstanceNum": {
                         "Ref": "SAPInstanceNum"
-                    },
-                    "SAPMasterPass": {
-                        "Ref": "SAPMasterPass"
                     },
                     "SAPPass": {
                         "Ref": "HANAMasterPass"
