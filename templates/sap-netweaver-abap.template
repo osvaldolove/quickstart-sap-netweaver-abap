@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS",
+    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS (qs-1no61sjkr)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -1016,13 +1016,26 @@
                                         "ec2:DeleteVolume",
                                         "ec2:CreateSecurityGroup",
                                         "ec2messages:*",
-                                        "ssm:*",
                                         "route53:GetHostedZone",
                                         "route53:ListHostedZones",
                                         "route53:ChangeResourceRecordSets",
                                         "route53:ListResourceRecordSets"
                                     ],
                                     "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "ec2:CreateVolume",
+                                    "Resource": {
+                                        "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*"
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": "ssm:*",
+                                    "Resource": {
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPass}"
+                                    }
                                 },
                                 {
                                     "Effect": "Allow",
@@ -1299,7 +1312,7 @@
                         "Fn::Join": [
                             "",
                             [
-                                "#!/bin/bash -xv\n",
+                                "#!/bin/bash\n",
                                 "export PATH=$PATH:/usr/local/bin\n",
                                 "mkdir -p /root/install\n",
                                 "hostname ",

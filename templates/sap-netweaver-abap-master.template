@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS",
+    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS (qs-1no61sjkm)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
