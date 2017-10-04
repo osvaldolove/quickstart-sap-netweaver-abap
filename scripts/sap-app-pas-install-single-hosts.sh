@@ -788,6 +788,9 @@ rm -rf sap*
 cd $SAPINST
 sleep 5
 
+#save logs to s3 bucket
+aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/start1-pas-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start1-pas-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 #test if SAP is up
@@ -807,6 +810,9 @@ then
 	touch /etc/sap-app-quickstart
 	chmod 1777 /tmp
 	mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket
+	#save logs to s3 bucket
+	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/after1-pas-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/after1-pas-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	exit
 else
 	echo "RETRY SAP install..."
@@ -834,8 +840,8 @@ else
 		touch /etc/sap-app-quickstart
 		chmod 1777 /tmp
 		mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket
-	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/success-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/success-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
+	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/success-else-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
+	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/success-else-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
         else
 		echo "SAP PAS failed to install...exiting"
 		#signal the waithandler, 1=Failed
