@@ -12,10 +12,6 @@
         "ParameterValue": "r4.large"
     },
     {
-        "ParameterKey": "SAPMasterPass",
-        "ParameterValue": "pass-ssm-store"
-    },
-    {
         "ParameterKey": "BASTIONInstanceType",
         "ParameterValue": "t2.large"
     },
@@ -33,7 +29,7 @@
     },
     {
         "ParameterKey": "HANAMasterPass",
-        "ParameterValue": "SAP9nineone"
+        "ParameterValue": "$[taskcat_genpass_16]"
     },
     {
         "ParameterKey": "HostCount",
