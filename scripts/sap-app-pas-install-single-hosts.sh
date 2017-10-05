@@ -102,8 +102,6 @@ set_install_ssm() {
 
 	chkconfig ssm on
 
-        aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/logs-from-ssm-function-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-        aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/logs-from-ssm-function-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 }
 
 set_dbinifile() {
@@ -266,8 +264,6 @@ set_filesystems() {
 
     #create and attach EBS volumes for /usr/sap and /sapmnt
 
-    aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start_set_fs-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-    aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start_set_fs-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
     bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
     bash /root/install/create-attach-single-volume.sh "100:gp2:$SAPMNT_DEVICE:$SAPMNT" > /dev/null
 
@@ -483,8 +479,6 @@ then
 fi
 
 #test copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-before-ssm-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-before-ssm-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 
 #recreat the SSM param store as encrypted
 _MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
@@ -495,8 +489,6 @@ while [ "$_MPVAL" -eq 0 -a "$_MPINV" -eq 0 ]
 do
 	echo "Waiting for SSM parameter store: $SSM_PARAM_STORE @ $(date)..."
 	_MPINV=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}' | grep INVALID | wc -l)
-	aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/ssm-loop-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/ssm-loop-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	sleep 15
 done
 
@@ -603,8 +595,6 @@ then
 else
      echo "FAILED to set hostname"
      /root/install/signalFinalStatus.sh 1 "FAILED to set hostname"
-     aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail-set-hostname-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail-set-hostname-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      exit
 fi
 
@@ -621,8 +611,6 @@ then
 else
      echo "FAILED to export NFS file(s)"
      /root/install/signalFinalStatus.sh 1 "FAILED to export NFS file(s)"
-     aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail-nfs-exp-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail-nfs-exp-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      exit
 fi
 
@@ -660,8 +648,6 @@ SIDADM=$(echo $SID\adm)
 #Install the ASCS and DB Instances
 
 #Prior to start of install...copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start-before-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start-before-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 umask 006
 
 cd $SAPINST
@@ -670,8 +656,6 @@ echo "Installing the ASCS instance...(1st try)"
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 #After start of install...copy some logs
-aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/after1-sap-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/after1-sap-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 
 su - "$SIDADM" -c "stopsap"
 sleep 5
@@ -697,8 +681,6 @@ then
      echo "Proceeding with database installation...(1st try)"
      cd $SAPINST
      #Prior to start of install...copy some logs
-     aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start1-before-db-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start1-before-db-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
   
      DB_DONE=$(su - "$SIDADM" -c "R3trans -d" | grep "R3trans finished (0000)")
@@ -728,8 +710,6 @@ else
      rm -rf sap*
      cd $SAPINST
      #Prior to start of install...copy some logs
-     aws s3 cp /var/log  s3://somckitk-swpm/logs/"$REGION"/start2-before-db-install-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-     aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start2-before-db-install-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
      echo "Proceeding with database installation...(2nd try)"
      ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
      
@@ -746,8 +726,6 @@ else
           set_cleanup_inifiles
           #/root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
 	  #save logs to s3 bucket
-	  aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail1-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	  aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail1-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	  LOG_MSG=$(cat /tmp/out-install /tmp/out-log)
           /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed: "$LOG_MSG" "
           exit 1
@@ -789,8 +767,6 @@ cd $SAPINST
 sleep 5
 
 #save logs to s3 bucket
-aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/start1-pas-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/start1-pas-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 #test if SAP is up
@@ -811,8 +787,6 @@ then
 	chmod 1777 /tmp
 	mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket
 	#save logs to s3 bucket
-	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/after1-pas-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/after1-pas-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 	exit
 else
 	echo "RETRY SAP install..."
@@ -840,13 +814,9 @@ else
 		touch /etc/sap-app-quickstart
 		chmod 1777 /tmp
 		mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket
-	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/success-else-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/success-else-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
         else
 		echo "SAP PAS failed to install...exiting"
 		#signal the waithandler, 1=Failed
-	  	aws s3 cp /var/log      s3://somckitk-swpm/logs/"$REGION"/fail2-var-log --recursive  --acl public-read > /tmp/out-install 2>&1
-	  	aws s3 cp /root/install  s3://somckitk-swpm/logs/"$REGION"/fail2-root-install --recursive  --acl public-read > /tmp/out-install 2>&1
 		/root/install/signalFinalStatus.sh 1 "SAP PAS failed to install...exiting"
                 set_cleanup_inifiles
 		exit
