@@ -56,7 +56,8 @@
                         "SAPsysGID",
                         "SAPTZ",
                         "SAPPass",
-                        "SAPInstallMedia",
+                        "SAPInstallMediaBucket",
+                        "SAPInstallMediaKeyPrefix",
                         "InstallSAP",
                         "InstallSAPASG"
                     ]
@@ -135,8 +136,11 @@
                 "SAPHANAIP": {
                     "default": "SAP HANA Server I.P."
                 },
-                "SAPInstallMedia": {
+                "SAPInstallMediaBucket": {
                     "default": "S3 bucket for SAP s/w"
+                },
+                "SAPInstallMediaKeyPrefix": {
+                    "default": "S3 Key Prefix for SAP s/w"
                 },
                 "SID": {
                     "default": "SAP system ID"
@@ -253,7 +257,6 @@
         },
         "PrivateSubnet1AID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Default": "subnet-xxxxxxxx",
             "Description": "The existing private subnet #1 in your VPC where you want to deploy SAP App Server Cluster.",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -316,13 +319,20 @@
             "Type": "String"
         },
         "SAPHANAIP": {
-            "Default": "10.69.1.x",
+            "Default": "10.0.x.x",
             "Description": "I.P. address of the SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
-        "SAPInstallMedia": {
-            "Default": "s3://   /",
-            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. The s/w will *not* download if the format is not correct (i.e. s3://mysapbucket/)",
+        "SAPInstallMediaBucket": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "Default": "my-sw-bucket",
+            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. Do *NOT* include s3:// (use just your bucket name)",
+            "Type": "String"
+        },
+        "SAPInstallMediaKeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+            "Default": "my/sw/version/",
+            "Description": "Name of your S3 Key Prefix for your SAP NetWeaver s/w. Leave blank if you do not use a Key Prefix",
             "Type": "String"
         },
         "SAPInstanceNum": {
@@ -369,7 +379,6 @@
         },
         "VPCID": {
             "AllowedPattern": "vpc-[0-9a-z]{8}",
-            "Default": "vpc-xxxxxxxx",
             "Description": "The existing Amazon VPC where you want to deploy SAP App Server Cluster.",
             "Type": "AWS::EC2::VPC::Id"
         }
@@ -996,36 +1005,59 @@
                 "Path": "/",
                 "Policies": [
                     {
-                        "PolicyName": "SAP-App-Server",
+                        "PolicyName": "SAP-PAS-Role",
                         "PolicyDocument": {
                             "Statement": [
+                               {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "s3:GetObject"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::${QSS3BucketName}/${QSS3KeyPrefix}*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::aws-data-provider/*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
+                                        }
+                                    ]
+                                },
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:GetObject",
-                                        "s3:Put*",
                                         "s3:ListBucket",
-                                        "ec2:Describe*",
-                                        "ec2:AttachNetworkInterface",
-                                        "ec2:AttachVolume",
-                                        "ec2:CreateTags",
-                                        "ec2:CreateVolume",
-                                        "ec2:CreateSnapshot",
-                                        "ec2:RunInstances",
-                                        "ec2:StartInstances",
-                                        "ec2:DeleteVolume",
-                                        "ec2:CreateSecurityGroup",
-                                        "ec2messages:*",
-                                        "route53:GetHostedZone",
-                                        "route53:ListHostedZones",
-                                        "route53:ChangeResourceRecordSets",
-                                        "route53:ListResourceRecordSets"
+                                        "s3:ListObjects"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2:DescribeInstances"
                                     ],
                                     "Resource": "*"
                                 },
                                 {
+                                "Effect": "Allow",
+                                "Action": [
+                                     "ec2messages:*"
+                              ],
+                               "Resource": "*"
+                               },
+                                {
                                     "Effect": "Allow",
-                                    "Action": "ec2:CreateVolume",
+                                    "Action": [
+                                        "ec2:CreateVolume",
+                                        "ec2:CreateTags",
+                                        "ec2:AttachVolume"
+                                     ],
                                     "Resource": {
                                         "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*"
                                     }
@@ -1039,22 +1071,10 @@
                                 },
                                 {
                                     "Effect": "Allow",
-                                    "Action": "cloudwatch:GetMetricStatistics",
-                                    "Resource": "*"
-                                },
-                                {
-                                    "Effect": "Allow",
-                                    "Action": [
-                                        "cloudformation:DescribeStacks",
-                                        "cloudformation:DescribeStackEvents",
-                                        "cloudformation:DescribeStackResource",
-                                        "cloudformation:DescribeStackResources",
-                                        "cloudformation:GetTemplate",
-                                        "cloudformation:List*"
-                                    ],
-                                    "Resource": [
-                                        "*"
-                                    ]
+                                    "Action": "ssm:*",
+                                    "Resource": {
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*"
+                                    }
                                 }
                             ]
                         }
@@ -1113,7 +1133,12 @@
                                         [
                                             "export S3_BUCKET=",
                                             {
-                                                "Ref": "SAPInstallMedia"
+                                                "Ref": "SAPInstallMediaBucket"
+                                            },
+                                            "\n",
+                                            "export S3_BUCKET_KP=",
+                                            {
+                                                "Ref": "SAPInstallMediaKeyPrefix"
                                             },
                                             "\n",
                                             "export SAP_SID=",
@@ -1211,15 +1236,6 @@
                                 "group": "root",
                                 "authentication": "S3AccessCreds"
                             },
-                            "/root/install/create-attach-single-volume.sh": {
-                                "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/create-attach-single-volume.sh"
-                                },
-                                "mode": "000500",
-                                "owner": "root",
-                                "group": "root",
-                                "authentication": "S3AccessCreds"
-                            },
                             "/root/install/download-sapapp.sh": {
                                 "source": {
                                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/download-sapapp.sh"
@@ -1262,6 +1278,20 @@
                         "DeviceName": "/dev/sda1",
                         "Ebs": {
                             "DeleteOnTermination": "True",
+                            "VolumeSize": "50",
+                            "VolumeType": "gp2"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvdb",
+                        "Ebs": {
+                            "VolumeSize": "50",
+                            "VolumeType": "gp2"
+                        }
+                    },
+                    {
+                        "DeviceName": "/dev/xvdc",
+                        "Ebs": {
                             "VolumeSize": "50",
                             "VolumeType": "gp2"
                         }

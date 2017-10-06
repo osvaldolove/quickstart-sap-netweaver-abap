@@ -56,7 +56,8 @@
                         "SAPInstanceNum",
                         "SIDadmUID",
                         "SAPTZ",
-                        "SAPInstallMedia",
+                        "SAPInstallMediaBucket",
+                        "SAPInstallMediaKeyPrefix",
                         "InstallSAP"
                     ]
                 },
@@ -180,8 +181,11 @@
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
                 },
-                "SAPInstallMedia": {
+                "SAPInstallMediaBucket": {
                     "default": "S3 bucket for SAP NetWeaver s/w."
+                },
+                "SAPInstallMediaKeyPrefix": {
+                    "default": "S3 Key Prefix for SAP NetWeaver s/w."
                 },
                 "SAPInstanceNum": {
                     "default": "SAP instance number"
@@ -454,9 +458,16 @@
             "Description": "Host name to use for SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
-        "SAPInstallMedia": {
-            "Default": "s3://   /",
-            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. The s/w will *not* download if the format is not correct (i.e. s3://mysapbucket/)",
+        "SAPInstallMediaBucket": {
+            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
+            "Default": "my-sw-bucket",
+            "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. Do *NOT* include s3:// (use just your bucket name)",
+            "Type": "String"
+        },
+        "SAPInstallMediaKeyPrefix": {
+            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
+            "Default": "my/sw/version/",
+            "Description": "Name of your S3 Key Prefix for your SAP NetWeaver s/w. Leave blank if you do not use a Key Prefix",
             "Type": "String"
         },
         "SAPInstanceNum": {
@@ -808,9 +819,13 @@
                             "Outputs.HANAMasterInstanceIP"
                         ]
                     },
-                    "SAPInstallMedia": {
-                        "Ref": "SAPInstallMedia"
+                    "SAPInstallMediaBucket": {
+                        "Ref": "SAPInstallMediaBucket"
                     },
+                    "SAPInstallMediaKeyPrefix": {
+                        "Ref": "SAPInstallMediaKeyPrefix"
+                    },
+
                     "SAPPASHostname": {
                         "Ref": "SAPPASHostname"
                     },
