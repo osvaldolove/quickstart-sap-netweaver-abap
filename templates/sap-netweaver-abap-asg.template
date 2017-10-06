@@ -836,7 +836,7 @@
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": {
-                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPass}"
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPassSSMParam}"
                                     }
                                 },
                                 {
