@@ -35,24 +35,6 @@ MASTER_HOSTS="/sapmnt/SWPM/master_etc_hosts"
 #
 ###  Variables below need to be CUSTOMIZED for your environment  ###
 
-#source the config.sh file
-
-set_configsh() {
-#download and source the latest config.sh file 
-
-	#download file config.sh file from S3
-	aws s3 cp "$S3_BUCKET""config.sh" /tmp/config.sh
-
-	#source the latest config.sh file (from /tmp/config.sh if it exists and its size is > 0)
-	if [ -s /tmp/config.sh ]
-	then
-		source /tmp/config.sh
-	else
-		source /root/install/config.sh
-	fi
-}
-
-set_configsh
 
 #
 _TEMP_NAME=$(echo $NAME | cut -c1-3)
@@ -139,7 +121,7 @@ set_awsdataprovider() {
 #install the AWS dataprovider require for AWS support
 
 	cd /tmp
-	wget https://s3.amazonaws.com/aws-data-provider/bin/aws-agent_install.sh > /dev/null
+        aws s3 cp s3://aws-data-provider/bin/aws-agent_install.sh . > /dev/null
 
 	if [ -f /tmp/aws-agent_install.sh ]
 	then
@@ -149,6 +131,7 @@ set_awsdataprovider() {
 		echo 1
 	fi
 }
+
 
 set_aasinifile() {
 #set the vname of the database server in the INI file
@@ -231,11 +214,11 @@ set_install_jq () {
 set_filesystems() {
 #create /usr/sap filesystem and mount /sapmnt
 
-	bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
+	#bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
 	USR_SAP_VOLUME=$(lsblk | grep xvdb)
 
 	#allocate SWAP space
-	bash /root/install/create-attach-single-volume.sh "16:gp2:/dev/xvdc:SWAP" > /dev/null
+	#bash /root/install/create-attach-single-volume.sh "50:gp2:/dev/xvdc:SWAP" > /dev/null
 
 	if [ -z "$USR_SAP_VOLUME" ]
 	then
@@ -625,9 +608,15 @@ set_ini_file () {
 
         if [ ! -e "$INI_FILE" ]
 	then
-		#re-download template files
+		#No template files - exit
 		FNAME=$(echo $INI_FILE | awk -F"/" '{ print $4 }')
-		aws s3 cp "$S3_BUCKET""$FNAME" $SW_TARGET
+                #signal failure and do not proceed
+                set_cleanup_temp_PAS
+                set_cleanup_aasinifile
+                #signal the waithandler, 1=Failure
+                /root/install/signalFinalStatus.sh 1 "There is not INI_FILE for silent SAP Install - Failure"
+		echo 1
+                exit 1
 	fi
 
 	cp $INI_FILE $INI_FILE.$HOSTNAME

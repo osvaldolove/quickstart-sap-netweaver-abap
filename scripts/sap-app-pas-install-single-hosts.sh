@@ -264,8 +264,8 @@ set_filesystems() {
 
     #create and attach EBS volumes for /usr/sap and /sapmnt
 
-    bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
-    bash /root/install/create-attach-single-volume.sh "100:gp2:$SAPMNT_DEVICE:$SAPMNT" > /dev/null
+    #bash /root/install/create-attach-single-volume.sh "50:gp2:$USR_SAP_DEVICE:$USR_SAP" > /dev/null
+    #bash /root/install/create-attach-single-volume.sh "100:gp2:$SAPMNT_DEVICE:$SAPMNT" > /dev/null
 
     USR_SAP_VOLUME=$(lsblk | grep xvdb) > /dev/null
     SAPMNT_VOLUME=$(lsblk | grep xvdc) > /dev/null
@@ -303,7 +303,7 @@ set_filesystems() {
      then
           
           #download the media from the S3 bucket provided
-          aws s3 sync $S3_BUCKET $SW_TARGET > /dev/null
+          aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
 	  cp /root/install/*.params "$SW_TARGET"
 
           if [ -d "$SAPINST" ]
@@ -313,7 +313,8 @@ set_filesystems() {
               echo 0
           else
 	      #retry the download again
-              aws s3 sync $S3_BUCKET $SW_TARGET > /dev/null
+              aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
+              #aws s3 sync "$S3_BUCKET/$S3_BUCKET_KP" "$SW_TARGET" > /dev/null
  	      if [ -d "$SAPINST" ]
 	      then
               	   chmod -R 755 $SW_TARGET > /dev/null 
