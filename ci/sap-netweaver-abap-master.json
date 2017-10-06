@@ -13,14 +13,14 @@
     },
     {
         "ParameterKey": "BASTIONInstanceType",
-        "ParameterValue": "t2.large"
+        "ParameterValue": "m4.large"
     },
     {
         "ParameterKey": "Encryption",
         "ParameterValue": "No"
     },
     {
-        "ParameterKey": "SAPInstallMedia",
+        "ParameterKey": "SAPInstallMediaBucket",
         "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/netweaver/abap/740/"
     },
     {
@@ -33,7 +33,7 @@
     },
     {
         "ParameterKey": "HostCount",
-        "ParameterValue": "6"
+        "ParameterValue": "1"
     },
     {
         "ParameterKey": "InstallSAP",
