@@ -324,13 +324,11 @@
             "Type": "String"
         },
         "SAPInstallMediaBucket": {
-            "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
             "Default": "my-sw-bucket",
             "Description": "Name of your S3 bucket for your SAP NetWeaver s/w. Do *NOT* include s3:// (use just your bucket name)",
             "Type": "String"
         },
         "SAPInstallMediaKeyPrefix": {
-            "AllowedPattern": "^[0-9a-zA-Z-/]*$",
             "Default": "my/sw/version/",
             "Description": "Name of your S3 Key Prefix for your SAP NetWeaver s/w. Leave blank if you do not use a Key Prefix",
             "Type": "String"
