@@ -577,9 +577,9 @@ else
 	else
      		echo
      		echo "FAILED to set /usr/sap and /sapmnt..."
-     		echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket: $S3_BUCKET"
+     		echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket and key prefix: "$S3_BUCKET""$S3_BUCKET_KP" "
      		#signal the waithandler, 1=Failed
-     		/root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket: $S3_BUCKET"
+     		/root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:  "$S3_BUCKET""$S3_BUCKET_KP" "
      		set_cleanup_inifiles
      		exit
 	fi
