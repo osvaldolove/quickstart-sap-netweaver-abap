@@ -10,6 +10,7 @@
 #
 
 ###Global Variables###
+source /root/install/config.sh
 TZ_LOCAL_FILE="/etc/localtime"
 NTP_CONF_FILE="/etc/ntp.conf"
 USR_SAP="/usr/sap"
@@ -807,28 +808,28 @@ fi
 
 #Test Internet connectivity - exit and terminate the EC2 instance if no connectivity#
 
-_TEST_INTERNET_CONN=$(curl --connect-timeout 30 ifconfig.co > /tmp/TEST_INTERNET_CONN 2>&1)&
+#_TEST_INTERNET_CONN=$(curl --connect-timeout 30 ifconfig.co > /tmp/TEST_INTERNET_CONN 2>&1)&
 
-sleep 15
+#sleep 15
 
-_TEST_INTERNET_RUNN=$(ps -ef | grep "curl --connect-timeout 30 ifconfig.co" | grep -v grep | wc -l)
+#_TEST_INTERNET_RUNN=$(ps -ef | grep "curl --connect-timeout 30 ifconfig.co" | grep -v grep | wc -l)
 
-sleep 20
+#sleep 20
 
-_TEST_INTERNET_TO=$(grep "timed out" /tmp/TEST_INTERNET_CONN)
+#_TEST_INTERNET_TO=$(grep "timed out" /tmp/TEST_INTERNET_CONN)
 
-if [[ "$_TEST_INTERNET_TO" =~ .*timed.* ]]
-then
-        if [ $_TEST_INTERNET_RUNN -eq 1 ]
-        then
-                echo "No Internet Connectivity...Please terminate this EC2 instance or resolve the connection issue."
+#if [[ "$_TEST_INTERNET_TO" =~ .*timed.* ]]
+#then
+#        if [ $_TEST_INTERNET_RUNN -eq 1 ]
+#        then
+#                echo "No Internet Connectivity...Please terminate this EC2 instance or resolve the connection issue."
 		#signal the waithandler, 1=Failed
-                /root/install/signalFinalStatus.sh 1 "Internet connectivity failed"
-		set_cleanup_aasinifile
-                exit 1
-        fi
-
-fi
+#                /root/install/signalFinalStatus.sh 1 "Internet connectivity failed"
+#		set_cleanup_aasinifile
+#                exit 1
+#        fi
+#
+#fi
 
 _SET_AWSCLI=$(set_update_cli)
 
