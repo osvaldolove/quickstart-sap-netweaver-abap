@@ -838,7 +838,10 @@
                                               { 
                                                   "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*" 
                                               },
-                                                             "arn:aws:ssm:::document/AWS-RunShellScript"  ]
+                                              {
+                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}::document/AWS-RunShellScript"  
+                                              }
+                                     ]
                                 }
                             ]
                         }

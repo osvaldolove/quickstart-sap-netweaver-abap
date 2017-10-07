@@ -1019,6 +1019,9 @@
                                             "Fn::Sub": "arn:aws:s3:::aws-data-provider/*"
                                         },
                                         {
+                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/*"
+                                        },
+                                        {
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
                                         }
                                     ]
@@ -1066,7 +1069,10 @@
                                               { 
                                                   "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*" 
                                               },
-                                                             "arn:aws:ssm:::document/AWS-RunShellScript" ]
+                                              {
+                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}::document/AWS-RunShellScript" 
+                                              }
+                                      ]
                                 }
                             ]
                         }
