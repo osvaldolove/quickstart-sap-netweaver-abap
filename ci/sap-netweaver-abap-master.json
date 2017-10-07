@@ -21,7 +21,7 @@
     },
     {
         "ParameterKey": "SAPInstallMediaBucket",
-        "ParameterValue": "s3://$[taskcat_getmediabucket]/"
+        "ParameterValue": "$[taskcat_getmediabucket]/"
     },
     {
         "ParameterKey": "SAPInstallMediaKeyPrefix",
