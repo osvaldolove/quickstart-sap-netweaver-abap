@@ -299,11 +299,14 @@ set_filesystems() {
 
      
 
-     if [ "$FS_USR_SAP" == "$USR_SAP" -a "$FS_SAPMNT" == "$SAPMNT" ]
-     then
+}
+
+set_s3_download() {
+#download the s/w
           
           #download the media from the S3 bucket provided
           aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
+
 	  cp /root/install/*.params "$SW_TARGET"
 
           if [ -d "$SAPINST" ]
@@ -315,6 +318,7 @@ set_filesystems() {
 	      #retry the download again
               aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
               #aws s3 sync "$S3_BUCKET/$S3_BUCKET_KP" "$SW_TARGET" > /dev/null
+
  	      if [ -d "$SAPINST" ]
 	      then
               	   chmod -R 755 $SW_TARGET > /dev/null 
@@ -324,8 +328,6 @@ set_filesystems() {
                    echo 1
               fi
           fi
-     fi
-
 }
 
 set_save_services_file() {
@@ -577,12 +579,26 @@ else
 	else
      		echo
      		echo "FAILED to set /usr/sap and /sapmnt..."
-     		echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket and key prefix: "$S3_BUCKET""$S3_BUCKET_KP" "
-     		#signal the waithandler, 1=Failed
-     		/root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:  "$S3_BUCKET""$S3_BUCKET_KP" "
-     		set_cleanup_inifiles
      		exit
 	fi
+fi
+
+echo
+echo "Start set_s3_download @ $(date)"
+echo
+_SET_S3=$(set_s3_download)
+
+if [ "$_SET_S3" == 0 ]
+then
+     echo "Successfully downloaded the s/w"
+else
+     echo
+     echo "FAILED to set /usr/sap and /sapmnt..."
+     echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket and key prefix:"$S3_BUCKET""$S3_BUCKET_KP" "
+     #signal the waithandler, 1=Failed
+     /root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET""$S3_BUCKET_KP" "
+     set_cleanup_inifiles
+     exit
 fi
 
 echo
