@@ -982,7 +982,7 @@
                 ]
             }
         },
-        "SAPIAMRole": {
+        "SAPPASIAMRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -1051,17 +1051,6 @@
                                },
                                 {
                                     "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:CreateVolume",
-                                        "ec2:CreateTags",
-                                        "ec2:AttachVolume"
-                                     ],
-                                    "Resource": {
-                                        "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*"
-                                    }
-                                },
-                                {
-                                    "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": {
                                         "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPass}"
@@ -1070,9 +1059,14 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
-                                    "Resource": {
-                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*"
-                                    }
+                                    "Resource": [ 
+                                              { 
+                                                  "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*" 
+                                              },
+                                              { 
+                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*" 
+                                              },
+                                                             "arn:aws:ssm:::document/AWS-RunShellScript" ]
                                 }
                             ]
                         }
@@ -1086,7 +1080,7 @@
                 "Path": "/",
                 "Roles": [
                     {
-                        "Ref": "SAPIAMRole"
+                        "Ref": "SAPPASIAMRole"
                     }
                 ]
             }
@@ -1112,7 +1106,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "SAPIAMRole"
+                            "Ref": "SAPPASIAMRole"
                         },
                         "buckets": [
                             {

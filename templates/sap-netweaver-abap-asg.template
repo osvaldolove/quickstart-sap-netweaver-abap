@@ -296,7 +296,7 @@
             "Type": "String"
         },
         "SAPPASIP": {
-            "Default": "10.69.1.x",
+            "Default": "10.0.x.x",
             "Description": "IP Address of SAP P.A.S Server. Can be the same as the ASCS server",
             "Type": "String"
         },
@@ -769,7 +769,7 @@
                 ]
             }
         },
-        "SAPIAMRole": {
+        "SAPAASIAMRole": {
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "AssumeRolePolicyDocument": {
@@ -823,17 +823,6 @@
                                },
                                 {
                                     "Effect": "Allow",
-                                    "Action": [
-                                        "ec2:CreateVolume",
-                                        "ec2:CreateTags",
-                                        "ec2:AttachVolume"
-                                     ],
-                                    "Resource": {
-                                        "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:volume/*"
-                                    }
-                                },
-                                {
-                                    "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": {
                                         "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPassSSMParam}"
@@ -842,9 +831,14 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
-                                    "Resource": {
-                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*"
-                                    }
+                                    "Resource": [ 
+                                              { 
+                                                  "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*" 
+                                              },
+                                              { 
+                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*" 
+                                              },
+                                                             "arn:aws:ssm:::document/AWS-RunShellScript"  ]
                                 }
                             ]
                         }
@@ -858,7 +852,7 @@
                 "Path": "/",
                 "Roles": [
                     {
-                        "Ref": "SAPIAMRole"
+                        "Ref": "SAPAASIAMRole"
                     }
                 ]
             }
@@ -959,7 +953,7 @@
                     "S3AccessCreds": {
                         "type": "S3",
                         "roleName": {
-                            "Ref": "SAPIAMRole"
+                            "Ref": "SAPAASIAMRole"
                         },
                         "buckets": [
                             {
