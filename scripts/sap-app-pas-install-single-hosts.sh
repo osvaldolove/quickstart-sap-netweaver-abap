@@ -333,6 +333,7 @@ set_s3_download() {
 	           cp /root/install/*.params "$SW_TARGET"
                    echo 0
               else
+     		   aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /tmp/nw_s3_downnload_error.log 2>&1
                    echo 1
               fi
           fi
@@ -603,8 +604,10 @@ else
      echo
      echo "FAILED to set /usr/sap and /sapmnt..."
      echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket and key prefix:"$S3_BUCKET""$S3_BUCKET_KP" "
+     #log the error message
+     S3_ERR=$(cat /tmp/nw_s3_downnload_error.log)
      #signal the waithandler, 1=Failed
-     /root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET""$S3_BUCKET_KP" "
+     /root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET""$S3_BUCKET_KP" ERR= "$S3_ERR" "
      set_cleanup_inifiles
      exit
 fi
