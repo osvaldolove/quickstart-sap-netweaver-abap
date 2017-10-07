@@ -1061,6 +1061,13 @@
                                 },
                                 {
                                     "Effect": "Allow",
+                                    "Action": "ssm:ListCommandInvocations",
+                                    "Resource": {
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:*"
+                                    }
+                                },
+                                {
+                                    "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": [ 
                                               { 
