@@ -297,7 +297,15 @@ set_filesystems() {
      FS_USR_SAP=$(df -h | grep "$USR_SAP" | awk '{ print $NF }')
      FS_SAPMNT=$(df -h | grep "$SAPMNT" | awk '{ print $NF }')
 
-     
+    if [ -z "$FS_USR_SAP" -o -z "$FS_SAPMNT" ]
+    then
+	#we did not successfully created the filesystems and mount points	
+	echo 1
+    else
+	#we did successfully created the filesystems and mount points	
+	echo 0
+
+    fi
 
 }
 
