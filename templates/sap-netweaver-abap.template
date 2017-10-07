@@ -1022,6 +1022,9 @@
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/*"
                                         },
                                         {
+                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}"
+                                        },
+                                        {
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
                                         }
                                     ]
