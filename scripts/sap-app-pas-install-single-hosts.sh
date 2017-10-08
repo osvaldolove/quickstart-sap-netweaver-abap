@@ -607,7 +607,7 @@ else
      #log the error message
      S3_ERR=$(cat /tmp/nw_s3_downnload_error.log)
      #signal the waithandler, 1=Failed
-     /root/install/signalFinalStatus.sh 1 "FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET""$S3_BUCKET_KP" ERR= "$S3_ERR" "
+     /root/install/signalFinalStatus.sh 1 \""FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET""$S3_BUCKET_KP" ERR= "$S3_ERR" "\"
      set_cleanup_inifiles
      exit
 fi
