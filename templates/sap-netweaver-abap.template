@@ -1032,8 +1032,7 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:ListBucket",
-                                        "s3:ListObjects"
+                                        "s3:List*"
                                     ],
                                     "Resource": [
                                         {
