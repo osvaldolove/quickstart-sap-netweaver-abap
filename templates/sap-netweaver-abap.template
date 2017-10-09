@@ -1019,12 +1019,6 @@
                                             "Fn::Sub": "arn:aws:s3:::aws-data-provider/*"
                                         },
                                         {
-                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/*"
-                                        },
-                                        {
-                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}"
-                                        },
-                                        {
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
                                         }
                                     ]
@@ -1032,20 +1026,11 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "s3:*"
+                                        "s3:ListBucket"
                                     ],
                                     "Resource": [
                                         {
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}"
-                                        },
-                                        {
-                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}*"
-                                        },
-                                        {
-                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}"
-                                        },
-                                        {
-                                            "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
                                         }
                                     ]
                                 },
