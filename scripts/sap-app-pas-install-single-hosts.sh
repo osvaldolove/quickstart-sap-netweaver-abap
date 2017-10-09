@@ -675,7 +675,6 @@ SIDADM=$(echo $SID\adm)
 
 #Install the ASCS and DB Instances
 
-#Prior to start of install...copy some logs
 umask 006
 
 cd $SAPINST
@@ -683,7 +682,6 @@ sleep 5
 echo "Installing the ASCS instance...(1st try)"
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
-#After start of install...copy some logs
 
 su - "$SIDADM" -c "stopsap"
 sleep 5
