@@ -84,6 +84,14 @@
         "ParameterValue": "10.0.144.0/20"
     },
     {
+        "ParameterKey": ""QSS3BucketName"",
+        "ParameterValue": "somckitk-swpm"
+    },
+    {
+        "ParameterKey": ""QSS3KeyPrefix"",
+        "ParameterValue": "sap/netweaver/abap/latest/"
+    },
+    {
         "ParameterKey": "RDPInstanceType",
         "ParameterValue": "m4.large"
     },
