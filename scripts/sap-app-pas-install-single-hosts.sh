@@ -731,6 +731,25 @@ else
      echo "Installing the ASCS instance...(2nd try)"
      ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
      
+     su - "$SIDADM" -c "stopsap"
+     sleep 5
+     su - "$SIDADM" -c "startsap"
+     sleep 5
+
+     #test if SAP is up
+     _SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
+
+     echo "This is the value of SAP_UP: $_SAP_UP"
+
+
+     if [ "$_SAP_UP" -eq 1 ]
+     then
+          echo "ASCS installed after 2nd retry..."
+     else
+          /root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry: "$LOG_MSG" "
+          exit 1
+     fi
+
      #Proceed with the Database Install
      cd /tmp
      rm -rf sap*
