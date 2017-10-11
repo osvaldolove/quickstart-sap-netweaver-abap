@@ -41,11 +41,11 @@
     },
     {
         "ParameterKey": "InstallSAP",
-        "ParameterValue": "No"
+        "ParameterValue": "Yes"
     },
     {
         "ParameterKey": "InstallSAPASG",
-        "ParameterValue": "No"
+        "ParameterValue": "Yes"
     },
     {
         "ParameterKey": "InstallRDPAndBastionInstance",
