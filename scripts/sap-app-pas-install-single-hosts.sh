@@ -712,7 +712,9 @@ echo "This is the value of SAP_UP: $_SAP_UP"
      then
           echo "ASCS installed on 1st try..."
      else
-          /root/install/signalFinalStatus.sh 1 "SAP ASCS install Failed...ASCS not installed on 1st try...SAP_UP= "$_SAP_UP" "
+	   S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
+	   S3_FILE_COUNT="3130"
+          /root/install/signalFinalStatus.sh 1 "SAP ASCS install Failed...ASCS not installed on 1st try...SAP_UP, S3_COUNT, S3_FILE_COUNT= "$_SAP_UP" "$S3_COUNT" "$S3_FILE_COUNT" "
           exit 1
      fi
 
