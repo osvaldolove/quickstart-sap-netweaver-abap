@@ -1132,6 +1132,11 @@
                                     "Fn::Join": [
                                         "",
                                         [
+                                            "export INSTALL_SAP=",
+                                            {
+                                                "Ref": "InstallSAP"
+                                            },
+                                            "\n",
                                             "export S3_BUCKET=",
                                             {
                                                 "Ref": "SAPInstallMediaBucket"
