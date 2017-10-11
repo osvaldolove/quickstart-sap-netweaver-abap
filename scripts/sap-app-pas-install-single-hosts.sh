@@ -605,6 +605,7 @@ S3_FILE_COUNT="3130"
 if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
 then
      /root/install/signalFinalStatus.sh 1 " FAILED to set /usr/sap and /sapmnt...check your S3 SAP software bucket: "$S3_COUNT" "$S3_FILE_COUNT" " 
+     exit 1
 fi
 
 if [ "$_SET_S3" == 0 ]
