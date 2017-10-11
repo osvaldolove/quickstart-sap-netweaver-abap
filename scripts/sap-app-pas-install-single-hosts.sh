@@ -327,8 +327,6 @@ set_s3_download() {
               aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
               #aws s3 sync "$S3_BUCKET/$S3_BUCKET_KP" "$SW_TARGET" > /dev/null
 
-              S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
-              S3_FILE_COUNT="3130"
 
  	      if [ -d "$SAPINST" ]
 	      then
@@ -336,11 +334,8 @@ set_s3_download() {
 	           cp /root/install/*.params "$SW_TARGET"
                    echo 0
               else
+                   echo 1
 
-		   if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
-		   then
-                   	echo 1
-		   fi
               fi
           fi
 }
@@ -603,6 +598,14 @@ echo
 echo "Start set_s3_download @ $(date)"
 echo
 _SET_S3=$(set_s3_download)
+
+S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
+S3_FILE_COUNT="3130"
+
+if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
+then
+     /root/install/signalFinalStatus.sh 1 " FAILED to set /usr/sap and /sapmnt...check your S3 SAP software bucket: "$S3_COUNT" "$S3_FILE_COUNT" " 
+fi
 
 if [ "$_SET_S3" == 0 ]
 then
