@@ -588,7 +588,8 @@ else
 	else
      		echo
      		echo "FAILED to set /usr/sap and /sapmnt..."
-     		exit
+                /root/install/signalFinalStatus.sh 0 "Success INSTALL_SAP = "$INSTALL_SAP" "
+     		exit 0
 	fi
 fi
 
@@ -746,7 +747,7 @@ else
      then
           echo "ASCS installed after 2nd retry..."
      else
-          /root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry: "$LOG_MSG" "
+          /root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry...SAP_UP= "$_SAP_UP" "
           exit 1
      fi
 
@@ -770,9 +771,9 @@ else
           echo "DB not installed."
           set_cleanup_inifiles
           #/root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed."
-	  #save logs to s3 bucket
-	  LOG_MSG=$(cat /tmp/out-install /tmp/out-log)
-          /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed: "$LOG_MSG" "
+          DB_DONE_ERR=$(su - $SIDADM -c "R3trans -d" > /tmp/sap_r3trans.log 2>&1 )
+          DB_DONE_LOG=$(cat /tmp/sap_r3trans.log )
+          /root/install/signalFinalStatus.sh 1 "SAP install RETRY Failed...DB not installed...LOG= "$DB_DONE_LOG" "
           exit 1
      fi
 fi
