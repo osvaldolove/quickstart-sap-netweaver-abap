@@ -327,14 +327,20 @@ set_s3_download() {
               aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /dev/null
               #aws s3 sync "$S3_BUCKET/$S3_BUCKET_KP" "$SW_TARGET" > /dev/null
 
+              S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
+              S3_FILE_COUNT="3130"
+
  	      if [ -d "$SAPINST" ]
 	      then
               	   chmod -R 755 $SW_TARGET > /dev/null 
 	           cp /root/install/*.params "$SW_TARGET"
                    echo 0
               else
-     		   aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /tmp/nw_s3_downnload_error.log 2>&1
-                   echo 1
+
+		   if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
+		   then
+                   	echo 1
+		   fi
               fi
           fi
 }
@@ -606,6 +612,7 @@ else
      echo "FAILED to set /usr/sap and /sapmnt..."
      echo "check /sapmnt/SWPM and permissions to your S3 SAP software bucket and key prefix:"$S3_BUCKET"/"$S3_BUCKET_KP" "
      #log the error message
+     aws s3 sync "s3://${S3_BUCKET}/${S3_BUCKET_KP}" "$SW_TARGET" > /tmp/nw_s3_downnload_error.log 2>&1
      S3_ERR=$(cat /tmp/nw_s3_downnload_error.log)
      #signal the waithandler, 1=Failed
      /root/install/signalFinalStatus.sh 1 \""FAILED to set /usr/sap and /sapmnt...check /sapmnt/SWPM and permissions to your S3 SAP software bucket:"$S3_BUCKET"/"$S3_BUCKET_KP" ERR= \"$S3_ERR\" "\"
