@@ -33,7 +33,7 @@
     },
     {
         "ParameterKey": "HANAMasterPass",
-        "ParameterValue": "$[taskcat_genpass_12]"
+        "ParameterValue": "$[taskcat_genpass_8]S@4"
     },
     {
         "ParameterKey": "HostCount",
