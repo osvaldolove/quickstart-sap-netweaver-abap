@@ -1010,6 +1010,7 @@
                                     "Effect": "Allow",
                                     "Action": [
                                         "s3:GetObject",
+                                        "s3:List*",
                                         "s3:Put*"
                                     ],
                                     "Resource": [
@@ -1018,6 +1019,12 @@
                                         },
                                         {
                                             "Fn::Sub": "arn:aws:s3:::aws-data-provider/*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::somckitk-swpm"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:s3:::somckitk-swpm/*"
                                         },
                                         {
                                             "Fn::Sub": "arn:aws:s3:::${SAPInstallMediaBucket}/${SAPInstallMediaKeyPrefix}*"
