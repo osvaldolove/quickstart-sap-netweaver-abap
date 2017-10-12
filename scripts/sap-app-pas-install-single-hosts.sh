@@ -716,6 +716,9 @@ echo "This is the value of SAP_UP: $_SAP_UP"
 	   S3_FILE_COUNT="3130"
 	   DEV_LOG=$(find /tmp/ASCS_instdir -type f -name sapinst_dev.log)
 	   MAL=$(grep -i malicious $DEV_LOG | wc -l)
+	   aws s3 cp /var/log          s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-var-log --recursive  --acl public-read > /tmp/out-install 2>&1 
+	   aws s3 cp /root/install     s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-root-install --recursive  --acl public-read > /tmp/out-install 2>&1 
+	   aws s3 cp /tmp/ASCS_instdir s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-tmp-dir --recursive  --acl public-read > /tmp/out-install 2>&1 
           /root/install/signalFinalStatus.sh 1 "SAP ASCS install Failed...ASCS not installed on 1st try...SAP_UP, S3_COUNT, S3_FILE_COUNT, MAL= "$_SAP_UP" "$S3_COUNT" "$S3_FILE_COUNT" "$MAL" "
           exit 1
      fi
