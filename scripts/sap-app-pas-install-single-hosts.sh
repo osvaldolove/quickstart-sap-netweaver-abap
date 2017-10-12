@@ -694,9 +694,6 @@ sleep 5
 echo "Installing the ASCS instance...(1st try)"
 ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
-#copy the ASCS install log
-cp -pr /tmp/sapinst_instdir /tmp/ASCS_instdir
-
 su - "$SIDADM" -c "stopsap"
 sleep 5
 su - "$SIDADM" -c "startsap"
@@ -707,22 +704,6 @@ _SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -
 
 echo "This is the value of SAP_UP: $_SAP_UP"
 
-##Temporary for testing ASCS install failure--remove later
-     if [ "$_SAP_UP" -eq 1 ]
-     then
-          echo "ASCS installed on 1st try..."
-     else
-	   S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
-	   S3_FILE_COUNT="3130"
-	   DEV_LOG=$(find /tmp/ASCS_instdir -type f -name sapinst_dev.log)
-	   MAL=$(grep -i malicious $DEV_LOG | wc -l)
-	   aws s3 cp /var/log          s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-var-log --recursive  --acl public-read > /tmp/out-install 2>&1 
-	   aws s3 cp /root/install     s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-root-install --recursive  --acl public-read > /tmp/out-install 2>&1 
-	   aws s3 cp /tmp/ASCS_instdir s3://somckitk-swpm/logs/"$REGION"/logs-from-ASCS-tmp-dir --recursive  --acl public-read > /tmp/out-install 2>&1 
-	   LOG=$(cat /tmp/out-install)
-          /root/install/signalFinalStatus.sh 1 "SAP ASCS install Failed...ASCS not installed on 1st try...SAP_UP, S3_COUNT, S3_FILE_COUNT, MAL, LOG= "$_SAP_UP" "$S3_COUNT" "$S3_FILE_COUNT" "$MAL" \""$LOG"\" "
-          exit 1
-     fi
 
 if [ "$_SAP_UP" -eq 1 ]
 then
