@@ -1006,7 +1006,7 @@
                         "PolicyName": "SAP-PAS-Role",
                         "PolicyDocument": {
                             "Statement": [
-                               {
+                                {
                                     "Effect": "Allow",
                                     "Action": [
                                         "s3:GetObject"
@@ -1042,12 +1042,12 @@
                                     "Resource": "*"
                                 },
                                 {
-                                "Effect": "Allow",
-                                "Action": [
-                                     "ec2messages:*"
-                              ],
-                               "Resource": "*"
-                               },
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "ec2messages:*"
+                                    ],
+                                    "Resource": "*"
+                                },
                                 {
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
@@ -1065,17 +1065,17 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
-                                    "Resource": [ 
-                                              { 
-                                                  "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*" 
-                                              },
-                                              { 
-                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*" 
-                                              },
-                                              {
-                                                  "Fn::Sub": "arn:aws:ssm:${AWS::Region}::document/AWS-RunShellScript" 
-                                              }
-                                      ]
+                                    "Resource": [
+                                        {
+                                            "Fn::Sub": "arn:aws:ec2:${AWS::Region}:${AWS::AccountId}:instance/*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:instance/*"
+                                        },
+                                        {
+                                            "Fn::Sub": "arn:aws:ssm:${AWS::Region}::document/AWS-RunShellScript"
+                                        }
+                                    ]
                                 }
                             ]
                         }

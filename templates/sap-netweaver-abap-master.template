@@ -613,7 +613,7 @@
                             "VPCStack",
                             "Outputs.PublicSubnet1CIDR"
                         ]
-                   },
+                    },
                     "DMZSubnet": {
                         "Fn::GetAtt": [
                             "VPCStack",
@@ -823,7 +823,6 @@
                     "SAPInstallMediaKeyPrefix": {
                         "Ref": "SAPInstallMediaKeyPrefix"
                     },
-
                     "SAPPASHostname": {
                         "Ref": "SAPPASHostname"
                     },
