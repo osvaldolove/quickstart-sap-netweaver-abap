@@ -1,0 +1,134 @@
+[
+    {
+        "ParameterKey": "AvailabilityZones",
+        "ParameterValue": "$[taskcat_getaz_2]"
+    },
+    {
+        "ParameterKey": "AutoRecovery",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "ASGMyInstanceType",
+        "ParameterValue": "r4.large"
+    },
+    {
+        "ParameterKey": "BASTIONInstanceType",
+        "ParameterValue": "m4.large"
+    },
+    {
+        "ParameterKey": "Encryption",
+        "ParameterValue": "No"
+    },
+    {
+        "ParameterKey": "SAPInstallMediaBucket",
+        "ParameterValue": "$[taskcat_getmediabucket]"
+    },
+    {
+        "ParameterKey": "SAPInstallMediaKeyPrefix",
+        "ParameterValue": "sap/netweaver/abap/740/"
+    },
+    {
+        "ParameterKey": "HANAInstallMedia",
+        "ParameterValue": "s3://$[taskcat_getmediabucket]/sap/hana/sps12/"
+    },
+    {
+        "ParameterKey": "HANAMasterPass",
+        "ParameterValue": "SAP9nineHana"
+    },
+    {
+        "ParameterKey": "HostCount",
+        "ParameterValue": "1"
+    },
+    {
+        "ParameterKey": "InstallSAP",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "InstallSAPASG",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "InstallRDPAndBastionInstance",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "KeyName",
+        "ParameterValue": "$[taskcat_getkeypair]"
+    },
+    {
+        "ParameterKey": "HANAInstanceType",
+        "ParameterValue": "r4.4xlarge"
+    },
+    {
+        "ParameterKey": "MyOS",
+        "ParameterValue": "SuSE-Linux-12-SP1-HVM"
+    },
+    {
+        "ParameterKey": "MyOSHANA",
+        "ParameterValue": "SuSE-Linux-12-SP1-HVM"
+    },
+    {
+        "ParameterKey": "PrivateSubnet1CIDR",
+        "ParameterValue": "10.0.0.0/19"
+    },
+    {
+        "ParameterKey": "PrivateSubnet2CIDR",
+        "ParameterValue": "10.0.32.0/19"
+    },
+    {
+        "ParameterKey": "PublicSubnet1CIDR",
+        "ParameterValue": "10.0.128.0/20"
+    },
+    {
+        "ParameterKey": "PublicSubnet2CIDR",
+        "ParameterValue": "10.0.144.0/20"
+    },
+    {
+        "ParameterKey": "RDPInstanceType",
+        "ParameterValue": "m4.large"
+    },
+    {
+        "ParameterKey": "RemoteAccessCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    },
+    {
+        "ParameterKey": "SAPInstanceNum",
+        "ParameterValue": "00"
+    },
+    {
+        "ParameterKey": "SAPAASHostname",
+        "ParameterValue": "sapaas"
+    },
+    {
+        "ParameterKey": "SAPHANAHostname",
+        "ParameterValue": "saphanaqs"
+    },
+    {
+        "ParameterKey": "SAPPASHostname",
+        "ParameterValue": "sappas00"
+    },
+    {
+        "ParameterKey": "SAPTZ",
+        "ParameterValue": "UC"
+    },
+    {
+        "ParameterKey": "SAPWPconf",
+        "ParameterValue": "D"
+    },
+    {
+        "ParameterKey": "SID",
+        "ParameterValue": "HDB"
+    },
+    {
+        "ParameterKey": "SIDadmUID",
+        "ParameterValue": "2001"
+    },
+    {
+        "ParameterKey": "VolumeType",
+        "ParameterValue": "gp2"
+    },
+    {
+        "ParameterKey": "VPCCIDR",
+        "ParameterValue": "10.0.0.0/16"
+    }
+]
