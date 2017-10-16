@@ -795,6 +795,11 @@
                             "Statement": [
                                 {
                                     "Effect": "Allow",
+                                    "Action": "cloudwatch:GetMetricStatistics",
+                                    "Resource": "*"
+                                },
+                                {
+                                    "Effect": "Allow",
                                     "Action": [
                                         "s3:GetObject"
                                     ],
@@ -810,7 +815,8 @@
                                 {
                                     "Effect": "Allow",
                                     "Action": [
-                                        "ec2:DescribeInstances"
+                                        "ec2:DescribeInstances",
+                                        "ec2:DescribeVolumes"
                                     ],
                                     "Resource": "*"
                                 },
