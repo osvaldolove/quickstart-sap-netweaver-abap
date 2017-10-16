@@ -1150,6 +1150,7 @@
                     {
                         "DeviceName": "/dev/xvdb",
                         "Ebs": {
+                            "DeleteOnTermination": "True",
                             "VolumeSize": "50",
                             "VolumeType": "gp2"
                         }
@@ -1157,6 +1158,7 @@
                     {
                         "DeviceName": "/dev/xvdc",
                         "Ebs": {
+                            "DeleteOnTermination": "True",
                             "VolumeSize": "50",
                             "VolumeType": "gp2"
                         }
