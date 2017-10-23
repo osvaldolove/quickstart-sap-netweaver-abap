@@ -57,7 +57,7 @@
                         "SIDadmUID",
                         "SAPInstanceNum",
                         "SAPTZ",
-                        "SAPNetweaverPassSSMParam",
+                        "SAPNetWeaverPassSSMParamName",
                         "InstallSAP"
                     ]
                 },
@@ -135,7 +135,7 @@
                 "SAPInstanceNum": {
                     "default": "SAP instance number"
                 },
-                "SAPNetweaverPassSSMParam": {
+                "SAPNetWeaverPassSSMParamName": {
                     "default": "EC2 parameter store encyrpted password"
                 },
                 "SAPPASHostname": {
@@ -282,7 +282,7 @@
             "Description": "SAP instance number to use for installation and setup, and to open ports for security groups.",
             "Type": "String"
         },
-        "SAPNetweaverPassSSMParam": {
+        "SAPNetWeaverPassSSMParamName": {
             "AllowedPattern": "^(?!ssm).*$",
             "ConstraintDescription": "Name of SSM param store can *not* begin with ssm.",
             "Description": "Name can *not* start with ssm. We store the encrypted master password in the EC2 SSM Parameter Store",
@@ -831,7 +831,7 @@
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": {
-                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPassSSMParam}"
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetWeaverPassSSMParamName}"
                                     }
                                 },
                                 {
@@ -994,7 +994,7 @@
                                             "\n",
                                             "export SSM_PARAM_STORE=",
                                             {
-                                                "Ref": "SAPNetweaverPassSSMParam"
+                                                "Ref": "SAPNetWeaverPassSSMParamName"
                                             },
                                             "\n",
                                             "export TZ_INPUT_PARAM=",

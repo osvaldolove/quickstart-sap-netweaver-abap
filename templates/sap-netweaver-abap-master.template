@@ -829,7 +829,7 @@
                     "SAPInstanceNum": {
                         "Ref": "SAPInstanceNum"
                     },
-                    "SAPPass": {
+                    "SAPNetWeaverPass": {
                         "Ref": "HANAMasterPass"
                     },
                     "SAPTZ": {
