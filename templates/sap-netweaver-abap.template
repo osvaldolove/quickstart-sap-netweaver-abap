@@ -55,7 +55,7 @@
                         "SIDadmUID",
                         "SAPsysGID",
                         "SAPTZ",
-                        "SAPPass",
+                        "SAPNetWeaverPass",
                         "SAPInstallMediaBucket",
                         "SAPInstallMediaKeyPrefix",
                         "InstallSAP",
@@ -157,7 +157,7 @@
                 "SAPTZ": {
                     "default": "SAP Server timezone"
                 },
-                "SAPPass": {
+                "SAPNetWeaverPass": {
                     "default": "Enter the value for your master password"
                 },
                 "VPCID": {
@@ -344,7 +344,7 @@
             "Description": "Host name to use for SAP P.A.S Server (DNS short name).",
             "Type": "String"
         },
-        "SAPPass": {
+        "SAPNetWeaverPass": {
             "ConstraintDescription": "required master password.",
             "Description": "**Your SAP master password**",
             "MinLength": "1",
@@ -592,13 +592,13 @@
                 ]
             }
         },
-        "SAPNetweaverPass": {
+        "SAPNetWeaverPassSSMParam": {
             "Type": "AWS::SSM::Parameter",
             "Properties": {
                 "Description": "Encrypted parameter store for master SAP password",
                 "Type": "String",
                 "Value": {
-                    "Ref": "SAPPass"
+                    "Ref": "SAPNetWeaverPass"
                 }
             }
         },
@@ -1058,7 +1058,7 @@
                                     "Effect": "Allow",
                                     "Action": "ssm:*",
                                     "Resource": {
-                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetweaverPass}"
+                                        "Fn::Sub": "arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/${SAPNetWeaverPassSSMParam}"
                                     }
                                 },
                                 {
@@ -1160,7 +1160,7 @@
                                             "\n",
                                             "export SSM_PARAM_STORE=",
                                             {
-                                                "Ref": "SAPNetweaverPass"
+                                                "Ref": "SAPNetWeaverPassSSMParam"
                                             },
                                             "\n",
                                             "export TZ_INPUT_PARAM=",
@@ -1455,8 +1455,8 @@
                     "SAPInstanceNum": {
                         "Ref": "SAPInstanceNum"
                     },
-                    "SAPNetweaverPassSSMParam": {
-                        "Ref": "SAPNetweaverPass"
+                    "SAPNetWeaverPassSSMParamName": {
+                        "Ref": "SAPNetWeaverPassSSMParam"
                     },
                     "SAPPASHostname": {
                         "Ref": "SAPPASHostname"
