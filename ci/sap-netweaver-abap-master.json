@@ -8,7 +8,7 @@
         "ParameterValue": "Yes"
     },
     {
-        "ParameterKey": "AAASMyInstanceType",
+        "ParameterKey": "AASMyInstanceType",
         "ParameterValue": "r4.large"
     },
     {
@@ -34,10 +34,6 @@
     {
         "ParameterKey": "HANAMasterPass",
         "ParameterValue": "$[taskcat_genpass_8A]"
-    },
-    {
-        "ParameterKey": "HostCount",
-        "ParameterValue": "1"
     },
     {
         "ParameterKey": "InstallSAP",
