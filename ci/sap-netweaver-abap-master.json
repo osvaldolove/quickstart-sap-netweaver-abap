@@ -36,10 +36,6 @@
         "ParameterValue": "$[taskcat_genpass_8A]"
     },
     {
-        "ParameterKey": "SAPNetWeaverPass",
-        "ParameterValue": "$[taskcat_genpass_8A]"
-    },
-    {
         "ParameterKey": "HostCount",
         "ParameterValue": "1"
     },
