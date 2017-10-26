@@ -505,11 +505,22 @@ do
 	sleep 15
 done
 
-_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+#Save the password
+#_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+##The password used to be in $NF but moved to $4
+_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $4}')
+
+#Delete the existing SSM param store
 aws ssm delete-parameter --name $SSM_PARAM_STORE --region $REGION
-aws ssm put-parameter --name $SSM_PARAM_STORE  --type "SecureString" --value "$_MP" --region $REGION 
+
+#Recreate SSM param store
 #Created an encrypted parameter_store for the master password
-MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+aws ssm put-parameter --name $SSM_PARAM_STORE  --type "SecureString" --value "$_MP" --region $REGION 
+
+#Store the pass for the SAP param files
+#MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+##The password used to be in $NF but moved to $4
+MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $4}')
 
 echo
 echo "Start set_install_jq @ $(date)"

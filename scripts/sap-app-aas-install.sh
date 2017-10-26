@@ -278,69 +278,6 @@ save_known_hosts() {
 
 }
 
-determine_hostname() {
-#save the known hosts first
-
-	save_known_hosts
-
-	HOSTNUM="99"
-
-	for NUM in $(seq 1 $HOSTNUM)
-	do
-		#handle the 9th app server
-		if [ $NUM -le 9 ]
-		then
-			PING0=$(ping -c 1 -W 1 $NAME\0$NUM | grep "100% packet loss")
-
-			#check to see if the ping was NOT successful
-			if [[ -z "$PING0" || "$PING0" =~ "100% packet loss" ]]
-			then
-				#test to see if we received 1 packet (PING0 could be unset because we did not grep for 1 pkt received)
-				PING01=$(ping -c 1 -W 1 $NAME\0$NUM | grep "1 received")
-				if [[ "$PING01" =~ "1 received" ]]
-				then
-					continue
-				else
-					#we have a match, this server is **not** in use
-					#set our HOSTNAME to this server
-					HOSTNAME=$NAME\0$NUM
-					echo $HOSTNAME > /tmp/HOSTNAME
-					break
-				fi
-			fi
-		else
-			#we are beyond 9 servers
-			PING1=$(ping -c 1 -W 1 $NAME$NUM | grep "100% packet loss")
-
-			#check to see if the ping was NOT successfull
-			if [[ -z "$PING1" || "$PING1" =~ "100% packet loss" ]]
-			then
-				#test to see if we received 1 packet (PING1 could be unset because we did not grep for 1 pkt received)
-				PING11=$(ping -c 1 -W 1 $NAME$NUM | grep "1 received")
-				if [[ "$PING11" =~ "1 received" ]]
-				then
-					continue
-				else
-					#we have a match, this server is **not** in use
-					#set our HOSTNAME to this server
-					HOSTNAME=$NAME$NUM
-					echo $HOSTNAME > /tmp/HOSTNAME
-					break
-				fi
-               		fi
-
-          	fi
-	done
-
-	_VAL_HOSTS=$(cat /tmp/HOSTNAME)
-
-	if [ "$HOSTNAME" == "$_VAL_HOSTS" ]
-	then
-		echo 0
-	else
-		echo 1
-	fi
-}
 
 set_tempname_PAS() {
 #call over to the PAS server and update its /etc/hosts file with this a temp name to access /sapmnt
@@ -458,7 +395,7 @@ set_perm_ssm() {
 set_hostname() {
 #set and preserve the hostname
 
-	determine_hostname
+	#determine_hostname
 
 	#update DNS search order with our DNS Domain name
 	sed -i "/NETCONFIG_DNS_STATIC_SEARCHLIST=""/ c\NETCONFIG_DNS_STATIC_SEARCHLIST="${DNS_DOMAIN}"" $NETCONFIG
@@ -466,7 +403,6 @@ set_hostname() {
 	#update the /etc/resolv.conf file
 	netconfig update -f > /dev/null
 
-	HOSTNAME=$(cat /tmp/HOSTNAME)
 	hostname $HOSTNAME
 
 	#update /etc/hosts file
@@ -861,7 +797,9 @@ else
 fi
 
 
-MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+#MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
+#INVALID_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}')
+MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $4}')
 INVALID_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}')
 
 if [ "$INVALID_MP" == "INVALIDPARAMETERS" ]
@@ -972,7 +910,6 @@ fi
 
 _SET_HOSTNAME=$(set_hostname)
 
-HOSTNAME=$(cat /tmp/HOSTNAME)
 
 if [ "$HOSTNAME" == $(hostname) ]
 then

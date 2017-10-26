@@ -12,16 +12,15 @@
                         "default": ""
                     },
                     "Parameters": [
+                        "HostedZoneName",
                         "VPCID",
                         "DMZSubnet",
                         "PrivateSubnet1CIDR",
                         "PrivateSubnet2CIDR",
                         "PublicSubnet1CIDR",
                         "PublicSubnet2CIDR",
-                        "AZA",
-                        "AZB",
-                        "Subnets1",
-                        "Subnets2"
+                        "PrivateSubnet1AID",
+                        "PrivateSubnet2AID"
                     ]
                 },
                 {
@@ -52,7 +51,6 @@
                         "SAPHANAIP",
                         "SAPAASHostname",
                         "SAPASGHostcount",
-                        "SAPWPconf",
                         "SID",
                         "SIDadmUID",
                         "SAPInstanceNum",
@@ -75,14 +73,11 @@
                 }
             ],
             "ParameterLabels": {
-                "AZA": {
-                    "default": "Choose 1st A.Z."
-                },
-                "AZB": {
-                    "default": "Choose 2nd A.Z."
-                },
                 "DMZSubnet": {
                     "default": "Choose public subnet"
+                },
+                "HostedZoneName": {
+                    "default": "R53 private hosted zone"
                 },
                 "InstallSAP": {
                     "default": "Install SAP software"
@@ -121,7 +116,7 @@
                     "default": "S3 key prefix for the Quick Start assets"
                 },
                 "SAPAASHostname": {
-                    "default": "SAP A.A.S Server hostname template"
+                    "default": "SAP A.A.S Server hostname"
                 },
                 "SAPASGHostcount": {
                     "default": "Max. number of servers in the Autoscaling group"
@@ -136,7 +131,7 @@
                     "default": "SAP instance number"
                 },
                 "SAPNetWeaverPassSSMParamName": {
-                    "default": "EC2 parameter store encyrpted password"
+                    "default": "EC2 parameter name"
                 },
                 "SAPPASHostname": {
                     "default": "SAP P.A.S server hostname"
@@ -147,20 +142,11 @@
                 "SAPTZ": {
                     "default": "SAP Server timezone"
                 },
-                "SAPWPconf": {
-                    "default": "SAP Work process config."
-                },
                 "SID": {
                     "default": "SAP system ID"
                 },
                 "SIDadmUID": {
                     "default": "SIDadm user id"
-                },
-                "Subnets1": {
-                    "default": "Choose 1st Subnet"
-                },
-                "Subnets2": {
-                    "default": "Choose 2nd Subnet"
                 },
                 "VPCID": {
                     "default": "Choose VPC ID"
@@ -169,6 +155,15 @@
         }
     },
     "Parameters": {
+        "HostedZoneName": {
+         "Description":"A fully-qualified R53 domain name.",
+         "Type":"String",
+         "MinLength":"1",
+         "MaxLength":"64",
+         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
+         "ConstraintDescription":"must be a valid fully-qualified domain name.",
+         "Default":"mycompany.com"
+        },
         "InstallSAP": {
             "AllowedValues": [
                 "Yes",
@@ -213,11 +208,23 @@
             "Description": "Operating system (SLES only) version for SAP servers.",
             "Type": "String"
         },
+        "PrivateSubnet1AID": {
+            "AllowedPattern": "subnet-[0-9a-z]{8}",
+            "Description": "The existing private subnet #1 in your VPC where you want to deploy SAP App Server Cluster.",
+            "Type": "AWS::EC2::Subnet::Id"
+        },
         "PrivateSubnet1CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
+            "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
             "Default": "10.0.0.0/19",
             "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
             "Type": "String"
+        },
+        "PrivateSubnet2AID": {
+            "AllowedPattern": "subnet-[0-9a-z]{8}",
+            "Default": "subnet-xxxxxxxx",
+            "Description": "The existing private subnet #2 in your VPC where you want to deploy SAP App Server Cluster",
+            "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet2CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
@@ -255,16 +262,9 @@
             "Type": "String"
         },
         "SAPAASHostname": {
-            "Default": "sapaas",
-            "Description": "Host name *template* to use for SAP A.A.S Server Autoscaling. First server will be sapaas01 then sapaas02 and so on.",
+            "Default": "sapaas00",
+            "Description": "Host name to use for SAP A.A.S Server.",
             "Type": "String"
-        },
-        "SAPASGHostcount": {
-            "Default": "6",
-            "Description": "How many SAP A.A.S Servers *maximum* in the Autoscaling group?",
-            "MaxValue": "6",
-            "MinValue": "1",
-            "Type": "Number"
         },
         "SAPHANAHostname": {
             "Default": "saphanaqs",
@@ -312,16 +312,6 @@
             "Description": "The TimeZone of your SAP Server (PT, CT, ET, or UTC)",
             "Type": "String"
         },
-        "SAPWPconf": {
-            "AllowedValues": [
-                "D",
-                "B",
-                "M"
-            ],
-            "Default": "D",
-            "Description": "Optimize SAP Instance for Dialog, Batch or Default work process configuration.",
-            "Type": "String"
-        },
         "SID": {
             "AllowedPattern": "([A-Z]{1}[0-9A-Z]{2})",
             "ConstraintDescription": "This value must consist of 3 characters.",
@@ -333,14 +323,6 @@
             "Default": "1001",
             "Description": "UID (default is 1001) for the SIDadm user.",
             "Type": "String"
-        },
-        "Subnets1": {
-            "Description": "Subnets to launch instances into",
-            "Type": "AWS::EC2::Subnet::Id"
-        },
-        "Subnets2": {
-            "Description": "Subnets to launch instances into",
-            "Type": "AWS::EC2::Subnet::Id"
         },
         "VPCID": {
             "AllowedPattern": "vpc-[0-9a-z]{8}",
@@ -862,6 +844,27 @@
                 ]
             }
         },
+        "SAPAASInterface": {
+            "Type": "AWS::EC2::NetworkInterface",
+            "Properties": {
+                "Description": "Network Interface for SAP AAS server",
+                "SubnetId": {
+                    "Ref": "PrivateSubnet2AID"
+                },
+                "GroupSet": [
+                    {
+                        "Ref": "SAPAASSecurityGroup"
+                    }
+                ],
+                "SourceDestCheck": "true",
+                "Tags": [
+                    {
+                        "Key": "Network",
+                        "Value": "Private"
+                    }
+                ]
+            }
+        },
         "SAPIAMProfile": {
             "Type": "AWS::IAM::InstanceProfile",
             "Properties": {
@@ -875,7 +878,6 @@
         },
         "WaitForSAPInstall": {
             "Type": "AWS::CloudFormation::WaitCondition",
-            "DependsOn": "SAPAASASG",
             "Properties": {
                 "Handle": {
                     "Ref": "WaitForPASInstallWaitHandle"
@@ -887,83 +889,8 @@
             "Type": "AWS::CloudFormation::WaitConditionHandle",
             "Properties": {}
         },
-        "SAPAASASG": {
-            "Type": "AWS::AutoScaling::AutoScalingGroup",
-            "Properties": {
-                "VPCZoneIdentifier": [
-                    {
-                        "Ref": "Subnets1"
-                    },
-                    {
-                        "Ref": "Subnets2"
-                    }
-                ],
-                "LaunchConfigurationName": {
-                    "Ref": "SAPAASLC"
-                },
-                "MinSize": "1",
-                "MaxSize": {
-                    "Ref": "SAPASGHostcount"
-                },
-                "Tags": [
-                    {
-                        "Key": "Name",
-                        "Value": {
-                            "Ref": "SAPAASHostname"
-                        },
-                        "PropagateAtLaunch": "true"
-                    }
-                ]
-            },
-            "UpdatePolicy": {
-                "AutoScalingRollingUpdate": {
-                    "MinInstancesInService": "0",
-                    "MinSuccessfulInstancesPercent": "0",
-                    "MaxBatchSize": "1",
-                    "PauseTime": "PT15M",
-                    "WaitOnResourceSignals": "false"
-                }
-            }
-        },
-        "ScaleUpPolicy": {
-            "Type": "AWS::AutoScaling::ScalingPolicy",
-            "Properties": {
-                "AdjustmentType": "ChangeInCapacity",
-                "AutoScalingGroupName": {
-                    "Ref": "SAPAASASG"
-                },
-                "Cooldown": "300",
-                "ScalingAdjustment": "1"
-            }
-        },
-        "CPUAlarmHigh": {
-            "Type": "AWS::CloudWatch::Alarm",
-            "Properties": {
-                "AlarmDescription": "Scale-up if CPU > 65% for 1 minutes",
-                "MetricName": "CPUUtilization",
-                "Namespace": "AWS/EC2",
-                "Statistic": "Average",
-                "Period": "60",
-                "EvaluationPeriods": "1",
-                "Threshold": "65",
-                "AlarmActions": [
-                    {
-                        "Ref": "ScaleUpPolicy"
-                    }
-                ],
-                "Dimensions": [
-                    {
-                        "Name": "AutoScalingGroupName",
-                        "Value": {
-                            "Ref": "SAPAASASG"
-                        }
-                    }
-                ],
-                "ComparisonOperator": "GreaterThanThreshold"
-            }
-        },
-        "SAPAASLC": {
-            "Type": "AWS::AutoScaling::LaunchConfiguration",
+        "SAPAASInstance": {
+            "Type": "AWS::EC2::Instance",
             "Metadata": {
                 "AWS::CloudFormation::Authentication": {
                     "S3AccessCreds": {
@@ -986,6 +913,15 @@
                                     "Fn::Join": [
                                         "",
                                         [
+                                            "export HOSTED_ZONE=",
+                                            {
+                                                "Ref": "HostedZoneName"
+                                            },
+                                            "\n",
+                                            "export INSTALL_SAP=",
+                                            {
+                                                "Ref": "InstallSAP"
+                                            },
                                             "\n",
                                             "export SAP_SID=",
                                             {
@@ -1022,6 +958,11 @@
                                                 "Ref": "MyOS"
                                             },
                                             "\n",
+                                            "export HOSTNAME=",
+                                            {
+                                                "Ref": "SAPAASHostname"
+                                            },
+                                            "\n",
                                             "export NAME=",
                                             {
                                                 "Ref": "SAPAASHostname"
@@ -1030,11 +971,6 @@
                                             "export SAPInstanceNum=",
                                             {
                                                 "Ref": "SAPInstanceNum"
-                                            },
-                                            "\n",
-                                            "export SAPWP=",
-                                            {
-                                                "Ref": "SAPWPconf"
                                             },
                                             "\n",
                                             "export SAP_PAS=",
@@ -1116,18 +1052,18 @@
                                 "group": "root",
                                 "authentication": "S3AccessCreds"
                             },
-                            "/root/install/sap-app-aas-install-ASG-dnl.sh": {
+                            "/root/install/sap-app-aas-install-dnl.sh": {
                                 "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install-ASG-dnl.sh"
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install-dnl.sh"
                                 },
                                 "mode": "000500",
                                 "owner": "root",
                                 "group": "root",
                                 "authentication": "S3AccessCreds"
                             },
-                            "/root/install/sap-app-aas-install-ASG.sh": {
+                            "/root/install/sap-app-aas-install.sh": {
                                 "source": {
-                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install-ASG.sh"
+                                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}scripts/sap-app-aas-install.sh"
                                 },
                                 "mode": "000500",
                                 "owner": "root",
@@ -1137,7 +1073,7 @@
                         },
                         "commands": {
                             "startinstall": {
-                                "command": "bash -xv /root/install/sap-app-aas-install-ASG-dnl.sh"
+                                "command": "bash -xv /root/install/sap-app-aas-install-dnl.sh"
                             }
                         }
                     }
@@ -1196,10 +1132,18 @@
                 "IamInstanceProfile": {
                     "Ref": "SAPIAMProfile"
                 },
-                "AssociatePublicIpAddress": false,
-                "SecurityGroups": [
+                "NetworkInterfaces": [
                     {
-                        "Ref": "SAPAASSecurityGroup"
+                        "NetworkInterfaceId": {
+                            "Ref": "SAPAASInterface"
+                        },
+                        "DeviceIndex": "0"
+                    }
+                ],
+                "Tags": [
+                    {
+                        "Key": "Name",
+                        "Value": "SAP AAS Server-Quick Start"
                     }
                 ],
                 "UserData": {
@@ -1232,7 +1176,7 @@
                                 {
                                     "Ref": "AWS::StackName"
                                 },
-                                "         --resource SAPAASLC ",
+                                "         --resource SAPAASInstance ",
                                 "         --region ",
                                 {
                                     "Ref": "AWS::Region"

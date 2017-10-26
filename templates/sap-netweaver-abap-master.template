@@ -42,12 +42,13 @@
                 },
                 {
                     "Label": {
-                        "default": "SAP App Cluster setup and configuration"
+                        "default": "SAP NetWeaver Cluster setup and configuration"
                     },
                     "Description": {
                         "default": ""
                     },
                     "Parameters": [
+                        "HostedZoneName",
                         "MyOS",
                         "AutoRecovery",
                         "SAPPASHostname",
@@ -63,17 +64,15 @@
                 },
                 {
                     "Label": {
-                        "default": "SAP Autoscaling Group setup and configuration"
+                        "default": "SAP Addtln. App Server setup and configuration"
                     },
                     "Description": {
                         "default": ""
                     },
                     "Parameters": [
-                        "InstallSAPASG",
-                        "ASGMyInstanceType",
-                        "SAPAASHostname",
-                        "HostCount",
-                        "SAPWPconf"
+                        "InstallSAPAAS",
+                        "AASMyInstanceType",
+                        "SAPAASHostname"
                     ]
                 },
                 {
@@ -103,8 +102,8 @@
                 }
             ],
             "ParameterLabels": {
-                "ASGMyInstanceType": {
-                    "default": "SAP Autoscaling App Server instance types"
+                "AASMyInstanceType": {
+                    "default": "SAP Addtln. App Server instance type"
                 },
                 "AutoRecovery": {
                     "default": "EC2 Auto Recovery"
@@ -127,8 +126,8 @@
                 "HANAMasterPass": {
                     "default": "SAP HANA password"
                 },
-                "HostCount": {
-                    "default": "Number of SAP Servers for Autoscaling Group"
+                "HostedZoneName": {
+                    "default": "R53 private hosted zone"
                 },
                 "InstallRDPAndBastionInstance": {
                     "default": "Install RDP and Bastion"
@@ -136,8 +135,8 @@
                 "InstallSAP": {
                     "default": "Install SAP software"
                 },
-                "InstallSAPASG": {
-                    "default": "Install Autoscaling Group"
+                "InstallSAPAAS": {
+                    "default": "Install SAP Addtln. App Server"
                 },
                 "KeyName": {
                     "default": "SSH key pair"
@@ -196,9 +195,6 @@
                 "SAPTZ": {
                     "default": "SAP Server timezone"
                 },
-                "SAPWPconf": {
-                    "default": "SAP Autoscaling Workprocess config."
-                },
                 "SID": {
                     "default": "SAP system ID"
                 },
@@ -224,7 +220,7 @@
                 "No"
             ]
         },
-        "ASGMyInstanceType": {
+        "AASMyInstanceType": {
             "AllowedValues": [
                 "r4.4xlarge",
                 "r4.2xlarge",
@@ -290,7 +286,8 @@
                 "r4.4xlarge",
                 "r4.2xlarge",
                 "x1.16xlarge",
-                "x1.32xlarge"
+                "x1.32xlarge",
+                "x1e.32xlarge"
             ],
             "Default": "r4.4xlarge",
             "Description": "Instance type for SAP HANA host.",
@@ -304,12 +301,14 @@
             "NoEcho": "true",
             "Type": "String"
         },
-        "HostCount": {
-            "Default": "6",
-            "Description": "How many SAP A.A.S Servers *maximum* in the Autoscaling group?",
-            "MaxValue": "6",
-            "MinValue": "1",
-            "Type": "Number"
+        "HostedZoneName": {
+         "Description":"A fully-qualified R53 domain name.",
+         "Type":"String",
+         "MinLength":"1",
+         "MaxLength":"64",
+         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
+         "ConstraintDescription":"must be a valid fully-qualified domain name.",
+         "Default":"mycompany.com"
         },
         "InstallRDPAndBastionInstance": {
             "AllowedValues": [
@@ -329,13 +328,13 @@
             "Description": "Install (Yes) or don't install (No) SAP App Server. When No, *only* the AWS infrastructure is provisioned.",
             "Type": "String"
         },
-        "InstallSAPASG": {
+        "InstallSAPAAS": {
             "AllowedValues": [
                 "Yes",
                 "No"
             ],
             "Default": "No",
-            "Description": "Install (Yes) or (No) don't install SAP AutoScaling Group for SAP App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
+            "Description": "Install (Yes) or (No) don't install SAP Addtln. App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
             "Type": "String"
         },
         "KeyName": {
@@ -442,7 +441,6 @@
         "RemoteAccessCIDR": {
             "AllowedPattern": "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})",
             "ConstraintDescription": "This must be a valid CIDR range in the format x.x.x.x/x.",
-            "Default": "0.0.0.0/0",
             "Description": "CIDR block from where you want to access instances in your public subnet(s).",
             "MaxLength": "18",
             "MinLength": "9",
@@ -450,7 +448,7 @@
         },
         "SAPAASHostname": {
             "Default": "sapaas",
-            "Description": "Host name *template* to use for SAP A.A.S Server Autoscaling. First server will be sapaas01 then sapaas02 and so on.",
+            "Description": "Host name *template* to use for SAP A.A.S Server",
             "Type": "String"
         },
         "SAPHANAHostname": {
@@ -489,16 +487,6 @@
             "ConstraintDescription": "This value must consist of 2 characters.",
             "Default": "UC",
             "Description": "The TimeZone of your SAP Server (PT, CT, ET, or UTC)",
-            "Type": "String"
-        },
-        "SAPWPconf": {
-            "AllowedValues": [
-                "D",
-                "B",
-                "M"
-            ],
-            "Default": "D",
-            "Description": "Optimize SAP Instance for Dialog, Batch or Default work process configuration.",
             "Type": "String"
         },
         "SID": {
@@ -742,14 +730,14 @@
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap.template"
                 },
                 "Parameters": {
-                    "HostCount": {
-                        "Ref": "HostCount"
-                    },
                     "AutoRecovery": {
                         "Ref": "AutoRecovery"
                     },
-                    "InstallSAPASG": {
-                        "Ref": "InstallSAPASG"
+                    "HostedZoneName": {
+                        "Ref": "HostedZoneName"
+                    },
+                    "InstallSAPAAS": {
+                        "Ref": "InstallSAPAAS"
                     },
                     "InstallSAP": {
                         "Ref": "InstallSAP"

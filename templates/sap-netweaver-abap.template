@@ -12,6 +12,7 @@
                         "default": ""
                     },
                     "Parameters": [
+                        "HostedZoneName",
                         "VPCID",
                         "PrivateSubnet1CIDR",
                         "PrivateSubnet2CIDR",
@@ -53,7 +54,6 @@
                         "SID",
                         "SAPInstanceNum",
                         "SIDadmUID",
-                        "SAPsysGID",
                         "SAPTZ",
                         "SAPNetWeaverPass",
                         "SAPInstallMediaBucket",
@@ -76,19 +76,19 @@
                 }
             ],
             "ParameterLabels": {
-                "ASGMyInstanceType": {
-                    "default": "Autoscaling App Servers"
+                "AASMyInstanceType": {
+                    "default": "SAP Addtln. App Server instance type"
                 },
                 "AutoRecovery": {
                     "default": "EC2 Auto Recovery"
                 },
-                "HostCount": {
-                    "default": "Number of SAP Servers in Autoscaling Group"
+                "HostedZoneName": {
+                    "default": "R53 private hosted zone"
                 },
                 "InstallSAP": {
                     "default": "Install SAP software"
                 },
-                "InstallSAPASG": {
+                "InstallSAPAS": {
                     "default": "Install SAP Autoscaling"
                 },
                 "KeyName": {
@@ -128,7 +128,7 @@
                     "default": "SAP P.A.S. Server host name (i.e. sappas00)"
                 },
                 "SAPAASHostname": {
-                    "default": "Autoscaling name template"
+                    "default": "SAP A.A.S. Server host name (i.e. sapaas00)"
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
@@ -151,14 +151,11 @@
                 "SIDadmUID": {
                     "default": "SIDadm user id"
                 },
-                "SAPsysGID": {
-                    "default": "SAPSYSS group id"
-                },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
                 },
                 "SAPNetWeaverPass": {
-                    "default": "Enter the value for your master password"
+                    "default": "SAP NetWeaver password"
                 },
                 "VPCID": {
                     "default": "VPC ID"
@@ -176,7 +173,7 @@
                 "No"
             ]
         },
-        "ASGMyInstanceType": {
+        "AASMyInstanceType": {
             "AllowedValues": [
                 "r4.4xlarge",
                 "r4.2xlarge",
@@ -195,12 +192,14 @@
             "Description": "Instance type for Autoscaling SAP AAS Servers.",
             "Type": "String"
         },
-        "HostCount": {
-            "Default": "6",
-            "Description": "How many SAP A.A.S Servers *maximum* in the Autoscaling group?",
-            "MaxValue": "6",
-            "MinValue": "1",
-            "Type": "Number"
+        "HostedZoneName": {
+         "Description":"A fully-qualified R53 domain name.",
+         "Type":"String",
+         "MinLength":"1",
+         "MaxLength":"64",
+         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
+         "ConstraintDescription":"must be a valid fully-qualified domain name.",
+         "Default":"mycompany.com"
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -211,13 +210,13 @@
             "Description": "Install (Yes) or don't install (No) SAP App Server. When set to No, *only* AWS infrastructure is provisioned.",
             "Type": "String"
         },
-        "InstallSAPASG": {
+        "InstallSAPAAS": {
             "AllowedValues": [
                 "Yes",
                 "No"
             ],
             "Default": "No",
-            "Description": "Install (Yes) or (No) don't install SAP AutoScaling for your SAP App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
+            "Description": "Install (Yes) or (No) don't install SAP Addtln. App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
             "Type": "String"
         },
         "KeyName": {
@@ -390,10 +389,10 @@
                 "Yes"
             ]
         },
-        "InstallSAPASGCond": {
+        "InstallSAPAASCond": {
             "Fn::Equals": [
                 {
-                    "Ref": "InstallSAPASG"
+                    "Ref": "InstallSAPAAS"
                 },
                 "Yes"
             ]
@@ -591,6 +590,31 @@
                     }
                 ]
             }
+        },
+        "HostedZone": {
+          "Type": "AWS::Route53::HostedZone",
+          "Properties": {
+            "HostedZoneConfig": {
+              "Comment": "R53 private hosted zone"
+            },
+            "Name": { 
+                    "Ref" : "HostedZoneName" 
+              },
+            "VPCs": [{
+              "VPCId": { 
+                    "Ref" : "VPCID" 
+              },
+              "VPCRegion": { 
+                    "Ref" : "AWS::Region" 
+              }
+           }],
+            "HostedZoneTags" : [{
+              "Key": "StackName",
+              "Value": {
+                    "Ref": "AWS::StackName"
+              }
+            }]
+          }
         },
         "SAPNetWeaverPassSSMParam": {
             "Type": "AWS::SSM::Parameter",
@@ -1138,6 +1162,11 @@
                                     "Fn::Join": [
                                         "",
                                         [
+                                            "export HOSTED_ZONE=",
+                                            {
+                                                "Ref": "HostedZoneName"
+                                            },
+                                            "\n",
                                             "export INSTALL_SAP=",
                                             {
                                                 "Ref": "InstallSAP"
@@ -1410,15 +1439,18 @@
                 }
             }
         },
-        "SAPASGStack": {
+        "SAPAASStack": {
             "DependsOn": "WaitForSAPInstall",
             "Type": "AWS::CloudFormation::Stack",
-            "Condition": "InstallSAPASGCond",
+            "Condition": "InstallSAPAASCond",
             "Properties": {
                 "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap-asg.template"
+                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap-aas.template"
                 },
                 "Parameters": {
+                    "HostedZoneName": {
+                        "Ref": "HostedZoneName"
+                    },
                     "InstallSAP": {
                         "Ref": "InstallSAP"
                     },
@@ -1426,13 +1458,28 @@
                         "Ref": "KeyName"
                     },
                     "MyInstanceType": {
-                        "Ref": "ASGMyInstanceType"
+                        "Ref": "AASMyInstanceType"
                     },
                     "MyOS": {
                         "Ref": "MyOS"
                     },
                     "PrivateSubnet1CIDR": {
                         "Ref": "PrivateSubnet1CIDR"
+                    },
+                    "PrivateSubnet1AID": {
+                        "Ref": "PrivateSubnet1AID"
+                    },
+                    "PrivateSubnet2AID": {
+                        "Ref": "PrivateSubnet2AID"
+                    },
+                    "PrivateSubnet2CIDR": {
+                        "Ref": "PrivateSubnet2CIDR"
+                    },
+                    "PublicSubnet1CIDR": {
+                        "Ref": "PublicSubnet1CIDR"
+                    },
+                    "PublicSubnet2CIDR": {
+                        "Ref": "PublicSubnet2CIDR"
                     },
                     "QSS3BucketName": {
                         "Ref": "QSS3BucketName"
@@ -1442,9 +1489,6 @@
                     },
                     "SAPAASHostname": {
                         "Ref": "SAPAASHostname"
-                    },
-                    "SAPASGHostcount": {
-                        "Ref": "HostCount"
                     },
                     "SAPHANAHostname": {
                         "Ref": "SAPHANAHostname"
@@ -1476,12 +1520,7 @@
                     "SIDadmUID": {
                         "Ref": "SIDadmUID"
                     },
-                    "Subnets1": {
-                        "Ref": "PrivateSubnet1AID"
-                    },
-                    "Subnets2": {
-                        "Ref": "PrivateSubnet2AID"
-                    },
+
                     "VPCID": {
                         "Ref": "VPCID"
                     }
