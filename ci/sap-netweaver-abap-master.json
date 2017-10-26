@@ -8,7 +8,7 @@
         "ParameterValue": "Yes"
     },
     {
-        "ParameterKey": "ASGMyInstanceType",
+        "ParameterKey": "AAASMyInstanceType",
         "ParameterValue": "r4.large"
     },
     {
@@ -44,7 +44,7 @@
         "ParameterValue": "Yes"
     },
     {
-        "ParameterKey": "InstallSAPASG",
+        "ParameterKey": "InstallSAPAAS",
         "ParameterValue": "Yes"
     },
     {
@@ -97,7 +97,7 @@
     },
     {
         "ParameterKey": "SAPAASHostname",
-        "ParameterValue": "sapaas"
+        "ParameterValue": "sapaas00"
     },
     {
         "ParameterKey": "SAPHANAHostname",
@@ -110,10 +110,6 @@
     {
         "ParameterKey": "SAPTZ",
         "ParameterValue": "UC"
-    },
-    {
-        "ParameterKey": "SAPWPconf",
-        "ParameterValue": "D"
     },
     {
         "ParameterKey": "SID",
