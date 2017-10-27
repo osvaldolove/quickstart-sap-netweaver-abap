@@ -460,7 +460,7 @@
             "Type": "String"
         },
         "SAPAASHostname": {
-            "Default": "sapaas",
+            "Default": "sapaas00",
             "Description": "Host name *template* to use for SAP A.A.S Server",
             "Type": "String"
         },

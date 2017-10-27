@@ -1148,6 +1148,7 @@
         },
         "SAPHANAR53Record" : {
             "Type" : "AWS::Route53::RecordSet",
+            "DependsOn": "HostedZone",
             "Properties" : {
                 "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
                 "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPHANAHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
@@ -1162,6 +1163,7 @@
         },
         "SAPPASR53Record" : {
             "Type" : "AWS::Route53::RecordSet",
+            "DependsOn": "HostedZone",
             "Properties" : {
                 "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
                 "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPPASHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
