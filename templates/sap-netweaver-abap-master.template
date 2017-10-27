@@ -50,7 +50,7 @@
                     "Parameters": [
                         "HostedZoneName",
                         "MyOS",
-                        "AutoRecovery",
+                        "AutoRecoveryPAS",
                         "SAPPASHostname",
                         "SID",
                         "MyInstanceType",
@@ -71,6 +71,7 @@
                     },
                     "Parameters": [
                         "InstallSAPAAS",
+                        "AutoRecoveryAAS",
                         "AASMyInstanceType",
                         "SAPAASHostname"
                     ]
@@ -105,7 +106,10 @@
                 "AASMyInstanceType": {
                     "default": "SAP Addtln. App Server instance type"
                 },
-                "AutoRecovery": {
+                "AutoRecoveryAAS": {
+                    "default": "EC2 Auto Recovery"
+                },
+                "AutoRecoveryPAS": {
                     "default": "EC2 Auto Recovery"
                 },
                 "BASTIONInstanceType": {
@@ -211,7 +215,16 @@
         }
     },
     "Parameters": {
-        "AutoRecovery": {
+        "AutoRecoveryAAS": {
+            "Type": "String",
+            "Description": "EC2 Automatic recovery feature",
+            "Default": "Yes",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
+        "AutoRecoveryPAS": {
             "Type": "String",
             "Description": "EC2 Automatic recovery feature",
             "Default": "Yes",
@@ -302,7 +315,7 @@
             "Type": "String"
         },
         "HostedZoneName": {
-         "Description":"A fully-qualified R53 domain name.",
+         "Description":"A R53 privated hosted zone will be created. Use a fully-qualified domain name.",
          "Type":"String",
          "MinLength":"1",
          "MaxLength":"64",
@@ -730,8 +743,11 @@
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap.template"
                 },
                 "Parameters": {
-                    "AutoRecovery": {
-                        "Ref": "AutoRecovery"
+                    "AutoRecoveryAAS": {
+                        "Ref": "AutoRecoveryAAS"
+                    },
+                    "AutoRecoveryPAS": {
+                        "Ref": "AutoRecoveryPAS"
                     },
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"

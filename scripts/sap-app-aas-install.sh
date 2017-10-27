@@ -110,6 +110,10 @@ set_oss_configs() {
     echo 0 > /proc/sys/kernel/numa_balancing
     echo "echo 0 > /proc/sys/kernel/numa_balancing" >> /etc/init.d/boot.local
 
+    #Increase max open files
+    echo 1048576 > /proc/sys/fs/nr_open
+    echo "echo 1048576 > /proc/sys/fs/nr_open" >> /etc/init.d/boot.local
+
     zypper -n install gcc
 
     zypper install libgcc_s1 libstdc++6
@@ -255,173 +259,40 @@ set_dhcp() {
 	fi
 }
 
-save_known_hosts() {
-#setup environment variable (/sapmnt must be available)
-
-	export LD_LIBRARY_PATH="/sapmnt/${SAP_SID}/exe/uc/linuxx86_64:$LD_LIBRARY_PATH"
-	PF="/sapmnt/${SAP_SID}/profile/DEFAULT.PFL"
-
-	set_services_file
-
-	ALL_AAS_IP=$(/sapmnt/${SAP_SID}/exe/uc/linuxx86_64/lgtst pf=$PF | grep $NAME | awk '{ print $3 }' |  sed 's/\[//g' | sed 's/\]//g')
-	ALL_AAS_NAME=$(/sapmnt/${SAP_SID}/exe/uc/linuxx86_64/lgtst pf=$PF | grep $NAME | awk '{ print $2 }' |  sed 's/\[//g' | sed 's/\]//g')
-
-	PAS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_PASIP" | awk '{ print $2 }')
-
-	echo $PAS_EC2ID > /tmp/PAS_EC2ID
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "hosts" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.all" --region $REGION --output text
-	sleep 15
-	cat "$SW_TARGET/hosts.all" >> "$HOSTS_FILE"
-
-	#merge the IP and NAMES and add to  /etc/hosts and /tmp
-	paste <(echo "$ALL_AAS_IP") <(echo "$ALL_AAS_NAME") >> $HOSTS_FILE
-
-}
 
 
-set_tempname_PAS() {
-#call over to the PAS server and update its /etc/hosts file with this a temp name to access /sapmnt
-
-	PAS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_PASIP" | awk '{ print $2 }')
-	UPD_HOSTS_CMD="$IP    $TEMP_NAME"
-
-	echo $PAS_EC2ID > /tmp/PAS_EC2ID
-	_SND_PAS=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "update_hosts" --parameters commands="echo $UPD_HOSTS_CMD >> $HOSTS_FILE" --query '*."CommandId"' --region $REGION --output text)
- 
-	sleep 10
-
-	_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND_PAS" --details --region $REGION  | grep -i success | wc -l)
-
-	#restart the nscd on the PAS
-	_SND_PAS=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart" --query '*."CommandId"' --region $REGION --output text)
-
-	sleep 5
-
-	if [ "$_SND_STAT" -ge 1 ]
-	then
-		echo 0
-	else
-		echo 1
-	fi
-}
 
 
-set_PAS_hostname() {
+set_DB_hostname() {
 
+	#add DB hostname
 	echo "$DBIP  $DBHOSTNAME" >> $HOSTS_FILE
-	echo "$SAP_PASIP  $SAP_PAS" >> $HOSTS_FILE
+
+	#add own hostname
+	MY_IP=$( ip a | grep inet | grep eth0 | awk -F"/" '{ print $1 }' | awk '{ print $2 }')
+	echo "${MY_IP}"    "${HOSTNAME}" >> /etc/hosts  
+
+	#echo "$SAP_PASIP  $SAP_PAS" >> $HOSTS_FILE
+	#echo "$SAP_PASIP  $SAP_PAS" >> $HOSTS_FILE
 	#echo "$SAP_ASCSIP  $SAP_ASCS" >> $HOSTS_FILE
 }
 
-set_perm_ssm() {
-#call over to the PAS & ASCS servers and update its /etc/hosts file with this server's IP and HOSTNAME
 
-	HOSTNAME=$(cat /tmp/HOSTNAME)
-	UPD_HOSTS_CMD="$IP    $HOSTNAME"
-
-	PAS_EC2ID=$(cat /tmp/PAS_EC2ID)
-	#ASCS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_ASCSIP" | awk '{ print $2 }')
-
-	#for f in $PAS_EC2ID $ASCS_EC2ID
-	for f in $PAS_EC2ID 
-	do
-		#save the current /etc/hosts file	
-		_SND_BAK=$(aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "copy_hosts_bak" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.bak" --query '*."CommandId"' --region $REGION --output text)
-		sleep 5
-                _SND_STAT_BAK=$(aws ssm list-command-invocations --command-id "$_SND_BAK" --details --region $REGION  | grep -i success | wc -l)
-
-	        #need to make sure the SND_BAK is successful before proceeding
-	        RETRY_COUNT=0
-       		RETRY_TIMES=5
-
-        	while [ "$_SND_STAT_BAK" -lt 1 ]
-        	do	
-                	#retry x times then hard exit with failure
-                	if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
-                	then
-                        	#signal failure and do not proceed
-                        	set_cleanup_temp_PAS
-                        	set_cleanup_aasinifile
-                        	#signal the waithandler, 1=Failure
-                        	/root/install/signalFinalStatus.sh 1 "set_perm_ssm function...COPY Backup host file Failed...retry x times then hard exit with failure"
-				echo 1
-                        	exit 1
-                	else
-				_SND_BAK=$(aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "copy_hosts_bak" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.bak" --query '*."CommandId"' --region $REGION --output text)
-                        	sleep 5
-                		_SND_STAT_BAK=$(aws ssm list-command-invocations --command-id "$_SND_BAK" --details --region $REGION  | grep -i success | wc -l)
-                        	let RETRY_COUNT=$RETRY_COUNT+1
-                	fi
-        	done	
-
-		#update the PAS's hosts file
-		if [ ! -z "$TEMP_NAME_NR" -o ! -z "$HOSTNAME" ]
-		then
-			grep -v "$TEMP_NAME_NR" $SW_TARGET/hosts.bak > $SW_TARGET/hosts.temp 
-			grep -v "$HOSTNAME" $SW_TARGET/hosts.temp > $SW_TARGET/hosts.new 
-			echo $UPD_HOSTS_CMD >> $SW_TARGET/hosts.new
-			_SND_PAS=$(aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "copy_hosts" --parameters commands="cp "$SW_TARGET/hosts.new" "$HOSTS_FILE"" --query '*."CommandId"' --region $REGION --output text)
-			sleep 5 
-              		_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND_PAS" --details --region $REGION  | grep -i success | wc -l)
-			aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service ncsd restart" --region $REGION --output text
-		else
-			echo 1
-			exit 1
-		fi
-
-                while [ "$_SND_STAT" -lt 1 ]
-                do 
-                        #retry x times then hard exit with failure
-                        if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
-                        then
-                                #signal failure and do not proceed
-                                set_cleanup_temp_PAS
-                                set_cleanup_aasinifile
-                                #signal the waithandler, 1=Failure
-                        	/root/install/signalFinalStatus.sh 1 "set_perm_ssm function...Update PAS host file Failed...retry x times then hard exit with failure"
-                                exit 1
-                        else
-				_SND_PAS=$(aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "copy_hosts" --parameters commands="cp "$SW_TARGET/hosts.new" "$HOSTS_FILE"" --query '*."CommandId"' --region $REGION --output text)
-                                sleep 5
-              			_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND_PAS" --details --region $REGION  | grep -i success | wc -l)
-				aws ssm send-command --instance-ids  $f --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service ncsd restart" --region $REGION --output text
-                                let RETRY_COUNT=$RETRY_COUNT+1
-                        fi
-                done
-	#done for the for loop
-	done
-}
-
-set_hostname() {
+set_net() {
 #set and preserve the hostname
 
-	#determine_hostname
 
 	#update DNS search order with our DNS Domain name
-	sed -i "/NETCONFIG_DNS_STATIC_SEARCHLIST=""/ c\NETCONFIG_DNS_STATIC_SEARCHLIST="${DNS_DOMAIN}"" $NETCONFIG
+	sed -i "/NETCONFIG_DNS_STATIC_SEARCHLIST=""/ c\NETCONFIG_DNS_STATIC_SEARCHLIST="${HOSTED_ZONE}"" $NETCONFIG
 
 	#update the /etc/resolv.conf file
 	netconfig update -f > /dev/null
-
-	hostname $HOSTNAME
-
-	#update /etc/hosts file
-	echo "$IP  $HOSTNAME" >> $HOSTS_FILE
-	echo "$HOSTNAME" > $HOSTNAME_FILE
 
 	sed -i '/preserve_hostname/ c\preserve_hostname: true' $CLOUD_CFG
 
 	#disable dhcp
 	_DISABLE_DHCP=$(set_dhcp)
 
-	#update the PAS & ASCS with the permanent hostname
-	_PERM=$(set_perm_ssm)
-
-	if [ "$PERM" -eq 1 ]
-	then
-		echo 1
-		exit 1
-	fi
 
 	if [ "$HOSTNAME" == $(hostname) ]
 	then
@@ -438,11 +309,8 @@ set_services_file() {
 }
 
 set_autofs() {
-#setup the /etc/auto.master and /etc/auto.direct files to mount /sapmnt from the PAS
+#setup NFS to mount /sapmnt from the PAS
 
-	#sed -i '/+auto.master/ c\#+auto.master' $AUTO_MASTER
-	#echo "/- auto.direct" >> $AUTO_MASTER
-	#echo "$SAPMNT -rw,rsize=32768,wsize=32768,timeo=14,intr $SAP_PAS:$SAPMNT" >> $AUTO_DIRECT
 
 	mkdir  $SAPMNT
         #check to see if there is already a /sapmnt entry in /etc/fstab
@@ -455,45 +323,26 @@ set_autofs() {
 		echo "$SAP_PAS:$SAPMNT  $SAPMNT nfs rw,soft,bg,timeo=14,intr 0 0" >> /etc/fstab 
 	fi
 
-	#update the /etc/hosts file on the PAS before we enable autofs
-	set_PAS_hostname
-	#now try to update the /etc/hosts file on the PAS
-	_SND_SSM=$(set_tempname_PAS)
 
-	PAS_EC2ID=$(cat /tmp/PAS_EC2ID)
+	PAS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_PASIP" | awk '{ print $2 }')
+
+        #insert the hosts file entry
+	MY_IP=$( ip a | grep inet | grep eth0 | awk -F"/" '{ print $1 }' | awk '{ print $2 }')
+	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "add_host" --parameters commands="echo "${MY_IP}"    "${HOSTNAME}" >> /etc/hosts"  --region $REGION --output text
+
+	sleep 5
+
 	#restart rpc.mountd on the PAS
 	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "restart mountd" --parameters commands="pkill rpc.mountd; /usr/sbin/rpc.mountd" --region $REGION --output text
+	
+	sleep 5
+
 	#restart the nscd 
 	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart"  --region $REGION --output text
 
-	COUNT=0
 
 	mount $SAPMNT
 
-	while [ "$_SND_SSM" == 1 ]
-	do
-		_SND_SSM=$(set_tempname_PAS)
-		#restart rpc.mountd on the PAS
-		aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "restart mountd" --parameters commands="pkill rpc.mountd; /usr/sbin/rpc.mountd" --region $REGION --output text
-		#restart the nscd 
-		aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart"  --region $REGION --output text
-		echo "Trying to update the /etc/hosts on the PAS: $SAP_PAS..."
-		sleep 15
-		let COUNT=$COUNT+1
-		mount $SAPMNT
-		
-		if [ $COUNT -ge 10 ]
-		then
-			echo "Failed to update the /etc/hosts on the PAS: $SAP_PAS after $COUNT tries...exiting"
-			exit 1
-		fi
-	done
-
-	#chkconfig autofs on
-	#service autofs restart
-	sleep 5
-
-	#_AD=$(ps -ef | grep $(cat /var/run/automount.pid) | grep -v grep |wc -l )
 	_DF=$(showmount -e "$SAP_PAS" | grep "$SAPMNT" | wc -l )
 
 	#check showmount 
@@ -574,16 +423,6 @@ set_ini_file () {
 	fi
 }
 
-set_cleanup_temp_PAS() {
-#remove saptemp from PAS server
-
-	PAS_EC2ID=$(cat /tmp/PAS_EC2ID)
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "update_hosts" --parameters commands="grep -v $TEMP_NAME $HOSTS_FILE > $HOSTS_FILE.temp" --query '*."CommandId"' --region $REGION --output text
-	sleep 15
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "update_hosts" --parameters commands="cp $HOSTS_FILE.temp $HOSTS_FILE" --query '*."CommandId"' --region $REGION --output text
-	sleep 15
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "update_hosts" --parameters commands="service ncsd restart" --query '*."CommandId"' --region $REGION --output text
-}
 
 set_install_ssm() {
 
@@ -610,91 +449,6 @@ set_install_ssm() {
 	fi
 }
 
-set_dist_hosts() {
-#from the current AAS server dist. hosts file ( the PAS server's /etc/hosts file has all of the known servers) 
-
-	PAS_EC2ID=$(cat /tmp/PAS_EC2ID)
-	_SND_PAS=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "copy_hosts_file" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.pas" --query '*."CommandId"' --region $REGION --output text)
-
-	sleep 15
-
-	_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND_PAS" --details --region $REGION  | grep -i success | wc -l)
-
-	#need to make sure the SND_PAS is successful before proceeding
-	RETRY_COUNT=0
-	RETRY_TIMES=5
-
-       	while [ "$_SND_STAT" -lt 1 ]
- 	do	
-		#retry 10 times then hard exit with failure	
-		if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
-		then
-			#signal failure and do not proceed		
-		        set_cleanup_temp_PAS
-        		set_cleanup_aasinifile
-        		#signal the waithandler, 1=Failure
-                        /root/install/signalFinalStatus.sh 1 "set_dist_hosts function...SND_PAS host file Failed...retry x times then hard exit with failure"
-			echo 1
-			exit 1
-		else
-			_SND_PAS=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "copy_hosts_file" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.pas" --query '*."CommandId"' --region $REGION --output text)
-			sleep 15
-			_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND_PAS" --details --region $REGION  | grep -i success | wc -l)
-			let RETRY_COUNT=$RETRY_COUNT+1
-		fi
-	done	
-
-	PF="/sapmnt/${SAP_SID}/profile/DEFAULT.PFL"
-	export LD_LIBRARY_PATH="/sapmnt/${SAP_SID}/exe/uc/linuxx86_64:$LD_LIBRARY_PATH"
-
-	#determine the valid EC2 servers in the SAP cluster by query the SAP message server
-	ALL_IPS=$(/sapmnt/${SAP_SID}/exe/uc/linuxx86_64/lgtst pf=$PF | grep DIA | awk '{ print $3 }' |  sed 's/\[//g' | sed 's/\]//g')
-
-	#Only update the hosts that are valid (conatined in ALL_IPS) and known to the SAP cluster 
-
-	for i in $ALL_IPS
-	do
-        	MYEC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$i" | awk '{ print $2 }')
-        	if [ ! -z "$MYEC2ID" ]
-        	then
-                	_SND=$(aws ssm send-command --instance-ids  $MYEC2ID --document-name "AWS-RunShellScript" --comment "update_hosts" --parameters commands="cp $SW_TARGET/hosts.pas $HOSTS_FILE" --query '*."CommandId"' --region $REGION --output text)
-			sleep 5 
-			_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND" --details --region $REGION  | grep -i success | wc -l)
-			#restart the nscd 
-			_SND_NSCD=$(aws ssm send-command --instance-ids  $MYEC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart" --query '*."CommandId"' --region $REGION --output text)
-
-			RETRY_COUNT=0
-			RETRY_TIMES=x
-
-			while [ "$_SND_STAT" -lt 1 ]
-		 	do	
-				#retry x times then hard exit with failure	
-				if [ "$RETRY_COUNT" -ge "$RETRY_TIMES" ]
-				then
-					#signal failure and do not proceed		
-		        		set_cleanup_temp_PAS
-        				set_cleanup_aasinifile
-        				#signal the waithandler, 1=Failure
-                        		/root/install/signalFinalStatus.sh 1 "set_dist_hosts function...Update ALL_IPs host file Failed...retry x times then hard exit with failure"
-					exit 1
-				else
-					_SND=$(aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "copy_hosts_file" --parameters commands="cp $HOSTS_FILE $SW_TARGET/hosts.pas" --query '*."CommandId"' --region $REGION --output text)
-					sleep 15
-					#reset SND_STAT
-					_SND_STAT=$(aws ssm list-command-invocations --command-id "$_SND" --details --region $REGION  | grep -i success | wc -l)
-					#restart the nscd 
-					_SND_NSCD=$(aws ssm send-command --instance-ids  $MYEC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart" --query '*."CommandId"' --region $REGION --output text)
-					#reset RETRY_COUNT 
-					let RETRY_COUNT=$RETRY_COUNT+1
-				fi
-			done	
-       		fi
-	#done for the for loop
-	done
-
-	#copy PAS hosts file locally
-	cp $SW_TARGET/hosts.pas /etc/hosts
-}
 
 set_install_cfn() {
 #install the cfn helper scripts
@@ -742,30 +496,20 @@ then
         exit 0
 fi
 
-#Test Internet connectivity - exit and terminate the EC2 instance if no connectivity#
+_SET_NET=$(set_net)
 
-#_TEST_INTERNET_CONN=$(curl --connect-timeout 30 ifconfig.co > /tmp/TEST_INTERNET_CONN 2>&1)&
 
-#sleep 15
-
-#_TEST_INTERNET_RUNN=$(ps -ef | grep "curl --connect-timeout 30 ifconfig.co" | grep -v grep | wc -l)
-
-#sleep 20
-
-#_TEST_INTERNET_TO=$(grep "timed out" /tmp/TEST_INTERNET_CONN)
-
-#if [[ "$_TEST_INTERNET_TO" =~ .*timed.* ]]
-#then
-#        if [ $_TEST_INTERNET_RUNN -eq 1 ]
-#        then
-#                echo "No Internet Connectivity...Please terminate this EC2 instance or resolve the connection issue."
-		#signal the waithandler, 1=Failed
-#                /root/install/signalFinalStatus.sh 1 "Internet connectivity failed"
-#		set_cleanup_aasinifile
-#                exit 1
-#        fi
-#
-#fi
+if [ "$HOSTNAME" == $(hostname) ]
+then
+	echo "Successfully set and updated hostname"
+	set_DB_hostname
+else
+	echo "FAILED to set hostname"
+	#signal the waithandler, 1=Failed
+        /root/install/signalFinalStatus.sh 1 "Failed to set hostname"
+	set_cleanup_aasinifile
+	exit 1
+fi
 
 _SET_AWSCLI=$(set_update_cli)
 
@@ -882,45 +626,18 @@ _SET_AUTOFS=$(set_autofs)
 
 _AUTOFS=$(df -h $SAPMNT | awk '{ print $NF }' | tail -1)
 
-#Set counter for Autofs retries
-COUNT=0
 
 if [ "$_AUTOFS" == "$SAPMNT"  ]
 then
 	echo "Successfully setup autofs"
 else
-	while [ "$_AUTOFS" != "$SAPMNT" ]
-	do
-		sleep 60
-		set_autofs
-		_AUTOFS=$(df -h $SAPMNT | awk '{ print $NF }' | tail -1)
-		echo "waiting for $SAPMNT to become available: $_AUTOFS"
-		let COUNT=$COUNT+1
-	
-		if [ $COUNT -ge 15 ]
-		then
-			echo "Failed to mount $SAPMNT, tried $COUNT times...exiting"
-			#signal the waithandler, 1=Failed
-        		/root/install/signalFinalStatus.sh 1 "Failed to mount $SAPMNT, tried $COUNT times...exiting"
-			set_cleanup_aasinifile
-			exit 1
-		fi
-	done
-fi
-
-_SET_HOSTNAME=$(set_hostname)
-
-
-if [ "$HOSTNAME" == $(hostname) ]
-then
-	echo "Successfully set and updated hostname"
-else
-	echo "FAILED to set hostname"
+	echo "Failed to mount $SAPMNT...exiting"
 	#signal the waithandler, 1=Failed
-        /root/install/signalFinalStatus.sh 1 "Failed to set hostname"
+       	/root/install/signalFinalStatus.sh 1 "Failed to mount $SAPMNT, tried $COUNT times...exiting"
 	set_cleanup_aasinifile
 	exit 1
 fi
+
 
 _SET_AWSDP=$(set_awsdataprovider)
 
@@ -933,6 +650,17 @@ else
         /root/install/signalFinalStatus.sh 1 "Failed to install AWS Data Provider...exiting"
 	set_cleanup_aasinifile
 	exit 1
+fi
+
+
+if [ "$INSTALL_SAP" == "No" ]
+then
+	echo "Completed setting up SAP App Server Infrastrucure."
+	echo "Exiting as the option to install SAP software was set to: $INSTALL_SAP"
+	#signal the waithandler, 0=Success
+	/root/install/signalFinalStatus.sh 0 "Finished. Exiting as the option to install SAP software was set to: $INSTALL_SAP"
+	exit 0
+
 fi
 
 ###Execute sapinst###
@@ -955,13 +683,13 @@ set_aasinifile
 
 cd $SAPINST
 sleep 5
-./sapinst SAPINST_INPUT_PARAMETERS_URL="$INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PRODUCT" SAPINST_SKIP_DIALOGS="true"
+./sapinst SAPINST_INPUT_PARAMETERS_URL="$INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PRODUCT" SAPINST_USE_HOSTNAME="$HOSTNAME" SAPINST_SKIP_DIALOGS="true"
 
 #configure SAP Workprocesses
 set_configSAPWP
 
 SIDADM=$(cat /tmp/SIDADM)
-HOSTNAME=$(cat /tmp/HOSTNAME)
+HOSTNAME=$(hostname)
 su - $SIDADM -c "stopsap $HOSTNAME"
 su - $SIDADM -c "startsap $HOSTNAME"
 

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS (qs-1no61sjkr)",
+    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Addtln. App Server (qs-1no61sjkr)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -12,7 +12,6 @@
                         "default": ""
                     },
                     "Parameters": [
-                        "HostedZoneName",
                         "VPCID",
                         "PrivateSubnet1CIDR",
                         "PrivateSubnet2CIDR",
@@ -30,27 +29,22 @@
                         "default": ""
                     },
                     "Parameters": [
-                        "MyOS",
-                        "MyInstanceType",
-                        "ASGMyInstanceType",
                         "KeyName"
                     ]
                 },
                 {
                     "Label": {
-                        "default": "SAP App Cluster setup and configuration"
+                        "default": "SAP NetWeaver Cluster setup and configuration"
                     },
                     "Description": {
                         "default": ""
                     },
                     "Parameters": [
-                        "AutoRecovery",
+                        "HostedZoneName",
                         "SAPPASHostname",
                         "SAPPASHostname",
                         "SAPHANAHostname",
                         "SAPHANAIP",
-                        "SAPAASHostname",
-                        "HostCount",
                         "SID",
                         "SAPInstanceNum",
                         "SIDadmUID",
@@ -58,8 +52,24 @@
                         "SAPNetWeaverPass",
                         "SAPInstallMediaBucket",
                         "SAPInstallMediaKeyPrefix",
-                        "InstallSAP",
-                        "InstallSAPASG"
+                        "MyInstanceType",
+                        "MyOS",
+                        "AutoRecoveryPAS",
+                        "InstallSAP"
+                    ]
+                },
+                {
+                    "Label": {
+                        "default": "SAP Addtln. App Server setup and configuration"
+                    },
+                    "Description": {
+                        "default": ""
+                    },
+                    "Parameters": [
+                        "SAPAASHostname",
+                        "AASMyInstanceType",
+                        "AutoRecoveryAAS",
+                        "InstallSAPAAS"
                     ]
                 },
                 {
@@ -79,7 +89,10 @@
                 "AASMyInstanceType": {
                     "default": "SAP Addtln. App Server instance type"
                 },
-                "AutoRecovery": {
+                "AutoRecoveryAAS": {
+                    "default": "EC2 Auto Recovery"
+                },
+                "AutoRecoveryPAS": {
                     "default": "EC2 Auto Recovery"
                 },
                 "HostedZoneName": {
@@ -88,8 +101,8 @@
                 "InstallSAP": {
                     "default": "Install SAP software"
                 },
-                "InstallSAPAS": {
-                    "default": "Install SAP Autoscaling"
+                "InstallSAPAAS": {
+                    "default": "Install SAP Addtln. App Server"
                 },
                 "KeyName": {
                     "default": "SSH key pair"
@@ -164,7 +177,16 @@
         }
     },
     "Parameters": {
-        "AutoRecovery": {
+        "AutoRecoveryAAS": {
+            "Type": "String",
+            "Description": "EC2 Automatic recovery feature",
+            "Default": "Yes",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
+        "AutoRecoveryPAS": {
             "Type": "String",
             "Description": "EC2 Automatic recovery feature",
             "Default": "Yes",
@@ -189,11 +211,11 @@
                 "c4.large"
             ],
             "Default": "r4.xlarge",
-            "Description": "Instance type for Autoscaling SAP AAS Servers.",
+            "Description": "Instance type for SAP AAS Servers.",
             "Type": "String"
         },
         "HostedZoneName": {
-         "Description":"A fully-qualified R53 domain name.",
+         "Description":"A *new* R53 privated hosted zone will be created. Use a fully-qualified domain name.",
          "Type":"String",
          "MinLength":"1",
          "MaxLength":"64",
@@ -308,8 +330,8 @@
             "Type": "String"
         },
         "SAPAASHostname": {
-            "Default": "sapaas",
-            "Description": "Host name *template* to use for SAP A.A.S Server Autoscaling. First server will be sapaas01 then sapaas02 and so on.",
+            "Default": "sapaas00",
+            "Description": "Host name to use for SAP A.A.S Server.",
             "Type": "String"
         },
         "SAPHANAHostname": {
@@ -344,8 +366,8 @@
             "Type": "String"
         },
         "SAPNetWeaverPass": {
-            "ConstraintDescription": "required master password.",
-            "Description": "**Your SAP master password**",
+            "ConstraintDescription": "required SAP master password.",
+            "Description": "*Your SAP master password*. The password is stored encrypted in the EC2 SSM parameter store",
             "MinLength": "1",
             "NoEcho": "true",
             "Type": "String"
@@ -384,7 +406,7 @@
         "AutoRecoveryMaster": {
             "Fn::Equals": [
                 {
-                    "Ref": "AutoRecovery"
+                    "Ref": "AutoRecoveryPAS"
                 },
                 "Yes"
             ]
@@ -559,12 +581,12 @@
             "Type": "AWS::CloudWatch::Alarm",
             "Condition": "AutoRecoveryMaster",
             "Properties": {
-                "AlarmDescription": "Trigger a recovery when instance status check fails for 5 consecutive minute.",
+                "AlarmDescription": "Trigger a recovery when instance status check fails for 2 consecutive minutes.",
                 "Namespace": "AWS/EC2",
                 "MetricName": "StatusCheckFailed_System",
                 "Statistic": "Minimum",
                 "Period": "60",
-                "EvaluationPeriods": "5",
+                "EvaluationPeriods": "2",
                 "ComparisonOperator": "GreaterThanThreshold",
                 "Threshold": "0",
                 "AlarmActions": [
@@ -1124,6 +1146,36 @@
                 ]
             }
         },
+        "SAPHANAR53Record" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
+                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPHANAHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
+                "Type" : "A",
+                "TTL" : "30",
+                "ResourceRecords" : [ {
+                        "Ref": 
+                            "SAPHANAIP"
+                            }
+                       ]
+               }
+        },
+        "SAPPASR53Record" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
+                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPPASHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
+                "Type" : "A",
+                "TTL" : "30",
+                "ResourceRecords" : [ {
+                        "Fn::GetAtt": [
+                            "SAPPASInstance",
+                            "PrivateIp"
+                        ]
+                    }
+                ]
+            }
+        },
         "WaitForSAPInstall": {
             "Type": "AWS::CloudFormation::WaitCondition",
             "DependsOn": "SAPPASInstance",
@@ -1200,6 +1252,11 @@
                                             "export DBHOSTNAME=",
                                             {
                                                 "Ref": "SAPHANAHostname"
+                                            },
+                                            "\n",
+                                            "export SAPPAS_HOSTNAME=",
+                                            {
+                                                "Ref": "SAPPASHostname"
                                             },
                                             "\n",
                                             "export DBIP=",
@@ -1448,6 +1505,9 @@
                     "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}templates/sap-netweaver-abap-aas.template"
                 },
                 "Parameters": {
+                    "AutoRecovery": {
+                        "Ref": "AutoRecoveryAAS"
+                    },
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"
                     },
@@ -1529,6 +1589,12 @@
         }
     },
     "Outputs": {
+        "SAPNetWeaverPassSSMParam": {
+            "Description": "EC2 SSM parameter store for encrypted SAP master password",
+            "Value": {
+                "Ref": "SAPNetWeaverPassSSMParam"
+            }
+        },
         "SAPPASInstanceIP": {
             "Description": "SAP PAS IP Address",
             "Value": {

@@ -20,6 +20,10 @@
         "ParameterValue": "No"
     },
     {
+        "ParameterKey": "HostedZoneName",
+        "ParameterValue": "$[alfred_genuuid].com"
+    },
+    {
         "ParameterKey": "SAPInstallMediaBucket",
         "ParameterValue": "$[taskcat_getmediabucket]"
     },

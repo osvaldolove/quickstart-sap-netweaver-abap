@@ -377,7 +377,7 @@ set_net() {
 #query the R53 private hosted zone for our hostname based on our I.P. Address
 
      #update DNS search order with our DNS Domain name
-     sed -i "/NETCONFIG_DNS_STATIC_SEARCHLIST=""/ c\NETCONFIG_DNS_STATIC_SEARCHLIST="${DNS_DOMAIN}"" $NETCONFIG
+     sed -i "/NETCONFIG_DNS_STATIC_SEARCHLIST=""/ c\NETCONFIG_DNS_STATIC_SEARCHLIST="${HOSTED_ZONE}"" $NETCONFIG
 
      #update the /etc/resolv.conf file
      netconfig update -f
@@ -703,7 +703,7 @@ umask 006
 cd $SAPINST
 sleep 5
 echo "Installing the ASCS instance...(1st try)"
-./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 su - "$SIDADM" -c "stopsap"
 sleep 5
@@ -729,7 +729,7 @@ then
      echo "Proceeding with database installation...(1st try)"
      cd $SAPINST
      #Prior to start of install...copy some logs
-     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME"  SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
   
      DB_DONE=$(su - "$SIDADM" -c "R3trans -d" | grep "R3trans finished (0000)")
 
@@ -751,7 +751,7 @@ else
      cd $SAPINST
      sleep 5
      echo "Installing the ASCS instance...(2nd try)"
-     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$ASCS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$ASCS_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME"  SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
      
      su - "$SIDADM" -c "stopsap"
      sleep 5
@@ -778,7 +778,7 @@ else
      cd $SAPINST
      #Prior to start of install...copy some logs
      echo "Proceeding with database installation...(2nd try)"
-     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+     ./sapinst SAPINST_INPUT_PARAMETERS_URL="$DB_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$DB_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME"  SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
      
      #Check the DB 
      DB_DONE=$(su - $SIDADM -c "R3trans -d" | grep "R3trans finished (0000)")
@@ -834,7 +834,7 @@ cd $SAPINST
 sleep 5
 
 #save logs to s3 bucket
-./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME"  SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 #test if SAP is up
 _SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )
@@ -863,7 +863,7 @@ else
 	cd $SAPINST
 	sleep 5
 
-	./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
+	./sapinst SAPINST_INPUT_PARAMETERS_URL="$PAS_INI_FILE" SAPINST_EXECUTE_PRODUCT_ID="$PAS_PRODUCT" SAPINST_USE_HOSTNAME="$SAPPAS_HOSTNAME"  SAPINST_SKIP_DIALOGS="true" SAPINST_SLP_MODE="false"
 
 	#test if SAP is up
 	_SAP_UP=$(netstat -an | grep 32"$SAPInstanceNum" | grep tcp | grep LISTEN | wc -l )

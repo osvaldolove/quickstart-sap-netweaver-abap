@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP App Server Autoscaling for SAP Additional Applicaiton Servers (qs-1no61sjl2)",
+    "Description": "Deploy SAP Additional Applicaiton Server (qs-1no61sjl2)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -12,9 +12,7 @@
                         "default": ""
                     },
                     "Parameters": [
-                        "HostedZoneName",
                         "VPCID",
-                        "DMZSubnet",
                         "PrivateSubnet1CIDR",
                         "PrivateSubnet2CIDR",
                         "PublicSubnet1CIDR",
@@ -31,31 +29,31 @@
                         "default": ""
                     },
                     "Parameters": [
-                        "MyOS",
-                        "MyInstanceType",
-                        "KeyName",
-                        "VolumeType"
+                        "KeyName"
                     ]
                 },
                 {
                     "Label": {
-                        "default": "SAP App Cluster setup and configuration"
+                        "default": "SAP App Server setup and configuration"
                     },
                     "Description": {
                         "default": ""
                     },
                     "Parameters": [
+                        "HostedZoneName",
                         "SAPPASHostname",
                         "SAPPASIP",
                         "SAPHANAHostname",
                         "SAPHANAIP",
                         "SAPAASHostname",
-                        "SAPASGHostcount",
                         "SID",
-                        "SIDadmUID",
                         "SAPInstanceNum",
+                        "SIDadmUID",
                         "SAPTZ",
                         "SAPNetWeaverPassSSMParamName",
+                        "MyOS",
+                        "MyInstanceType",
+                        "AutoRecovery",
                         "InstallSAP"
                     ]
                 },
@@ -73,11 +71,11 @@
                 }
             ],
             "ParameterLabels": {
-                "DMZSubnet": {
-                    "default": "Choose public subnet"
+                "AutoRecovery": {
+                    "default": "EC2 Auto Recovery"
                 },
                 "HostedZoneName": {
-                    "default": "R53 private hosted zone"
+                    "default": "Existing R53 private hosted zone name"
                 },
                 "InstallSAP": {
                     "default": "Install SAP software"
@@ -131,7 +129,7 @@
                     "default": "SAP instance number"
                 },
                 "SAPNetWeaverPassSSMParamName": {
-                    "default": "EC2 parameter name"
+                    "default": "Existing EC2 SSM parameter store name"
                 },
                 "SAPPASHostname": {
                     "default": "SAP P.A.S server hostname"
@@ -155,8 +153,17 @@
         }
     },
     "Parameters": {
+        "AutoRecovery": {
+            "Type": "String",
+            "Description": "EC2 Automatic recovery feature",
+            "Default": "Yes",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
         "HostedZoneName": {
-         "Description":"A fully-qualified R53 domain name.",
+         "Description":"Name of an *existing* R53 privated hosted zone. Use a fully-qualified domain name.",
          "Type":"String",
          "MinLength":"1",
          "MaxLength":"64",
@@ -284,8 +291,8 @@
         },
         "SAPNetWeaverPassSSMParamName": {
             "AllowedPattern": "^(?!ssm).*$",
-            "ConstraintDescription": "Name of SSM param store can *not* begin with ssm.",
-            "Description": "Name can *not* start with ssm. We store the encrypted master password in the EC2 SSM Parameter Store",
+            "ConstraintDescription": "Name of *existing* SSM  parameter store can *not* begin with ssm.",
+            "Description": "Name of *existing* EC2 SSM  parameter store. The encrypted master password is stored in the SSM parameter store",
             "MinLength": "1",
             "NoEcho": "false",
             "Type": "String"
@@ -331,7 +338,16 @@
             "Type": "AWS::EC2::VPC::Id"
         }
     },
-    "Conditions": {},
+    "Conditions": {
+        "AutoRecoveryMaster": {
+            "Fn::Equals": [
+                {
+                    "Ref": "AutoRecovery"
+                },
+                "Yes"
+            ]
+        }
+      },
     "Mappings": {
         "SAPAMINameMap": {
             "Red-Hat-Enterprise-Linux-6.6-HVM": {
@@ -500,6 +516,58 @@
         }
     },
     "Resources": {
+        "AutoRecoverAlarmMaster": {
+            "Type": "AWS::CloudWatch::Alarm",
+            "Condition": "AutoRecoveryMaster",
+            "Properties": {
+                "AlarmDescription": "Trigger a recovery when instance status check fails for 2 consecutive minutes  .",
+                "Namespace": "AWS/EC2",
+                "MetricName": "StatusCheckFailed_System",
+                "Statistic": "Minimum",
+                "Period": "60",
+                "EvaluationPeriods": "2",
+                "ComparisonOperator": "GreaterThanThreshold",
+                "Threshold": "0",
+                "AlarmActions": [
+                    {
+                        "Fn::Join": [
+                            "",
+                            [
+                                "arn:aws:automate:",
+                                {
+                                    "Ref": "AWS::Region"
+                                },
+                                ":ec2:recover"
+                            ]
+                        ]
+                    }
+                ],
+                "Dimensions": [
+                    {
+                        "Name": "InstanceId",
+                        "Value": {
+                            "Ref": "SAPAASInstance"
+                        }
+                    }
+                ]
+            }
+        },
+        "SAPAASR53Record" : {
+            "Type" : "AWS::Route53::RecordSet",
+            "Properties" : {
+                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
+                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPAASHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
+                "Type" : "A",
+                "TTL" : "30",
+                "ResourceRecords" : [ {
+                        "Fn::GetAtt": [
+                            "SAPAASInstance",
+                            "PrivateIp"
+                        ]
+                    }
+                ]
+            }
+        },
         "SAPAASSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
@@ -1153,6 +1221,23 @@
                             [
                                 "#!/bin/bash\n",
                                 "mkdir -p /root/install\n",
+                                "hostname ",
+                                {
+                                    "Ref": "SAPAASHostname"
+                                },
+                                "\n",
+                                "echo ",
+                                {
+                                    "Fn::Join": [
+                                        ".",
+                                        [
+                                            {
+                                                "Ref": "SAPAASHostname"
+                                            }
+                                        ]
+                                    ]
+                                },
+                                " > /etc/HOSTNAME\n",
                                 "export PATH=$PATH:/usr/local/bin\n",
                                 "       cd /tmp\n",
                                 "       wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
