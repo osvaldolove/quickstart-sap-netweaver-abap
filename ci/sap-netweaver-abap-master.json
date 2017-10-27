@@ -25,7 +25,7 @@
     },
     {
         "ParameterKey": "HostedZoneName",
-        "ParameterValue": "$[alfred_genuuid].com"
+        "ParameterValue": "$[taskcat_getaz_1].com"
     },
     {
         "ParameterKey": "SAPInstallMediaBucket",
@@ -41,7 +41,7 @@
     },
     {
         "ParameterKey": "HANAMasterPass",
-        "ParameterValue": "SAP9nineaws"
+        "ParameterValue": "$[taskcat_genpass_10A]"
     },
     {
         "ParameterKey": "InstallSAP",
