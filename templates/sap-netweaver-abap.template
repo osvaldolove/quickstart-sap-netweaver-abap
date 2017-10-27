@@ -215,13 +215,13 @@
             "Type": "String"
         },
         "HostedZoneName": {
-         "Description":"A *new* R53 privated hosted zone will be created. Use a fully-qualified domain name.",
-         "Type":"String",
-         "MinLength":"1",
-         "MaxLength":"64",
-         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
-         "ConstraintDescription":"must be a valid fully-qualified domain name.",
-         "Default":"mycompany.com"
+            "Description": "A *new* R53 privated hosted zone will be created. Use a fully-qualified domain name.",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "64",
+            "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
+            "ConstraintDescription": "must be a valid fully-qualified domain name.",
+            "Default": "mycompany.com"
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -614,29 +614,33 @@
             }
         },
         "HostedZone": {
-          "Type": "AWS::Route53::HostedZone",
-          "Properties": {
-            "HostedZoneConfig": {
-              "Comment": "R53 private hosted zone"
-            },
-            "Name": { 
-                    "Ref" : "HostedZoneName" 
-              },
-            "VPCs": [{
-              "VPCId": { 
-                    "Ref" : "VPCID" 
-              },
-              "VPCRegion": { 
-                    "Ref" : "AWS::Region" 
-              }
-           }],
-            "HostedZoneTags" : [{
-              "Key": "StackName",
-              "Value": {
-                    "Ref": "AWS::StackName"
-              }
-            }]
-          }
+            "Type": "AWS::Route53::HostedZone",
+            "Properties": {
+                "HostedZoneConfig": {
+                    "Comment": "R53 private hosted zone"
+                },
+                "Name": {
+                    "Ref": "HostedZoneName"
+                },
+                "VPCs": [
+                    {
+                        "VPCId": {
+                            "Ref": "VPCID"
+                        },
+                        "VPCRegion": {
+                            "Ref": "AWS::Region"
+                        }
+                    }
+                ],
+                "HostedZoneTags": [
+                    {
+                        "Key": "StackName",
+                        "Value": {
+                            "Ref": "AWS::StackName"
+                        }
+                    }
+                ]
+            }
         },
         "SAPNetWeaverPassSSMParam": {
             "Type": "AWS::SSM::Parameter",
@@ -1146,30 +1150,79 @@
                 ]
             }
         },
-        "SAPHANAR53Record" : {
-            "Type" : "AWS::Route53::RecordSet",
+        "SAPHANAR53Record": {
+            "Type": "AWS::Route53::RecordSet",
             "DependsOn": "HostedZone",
-            "Properties" : {
-                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
-                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPHANAHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
-                "Type" : "A",
-                "TTL" : "30",
-                "ResourceRecords" : [ {
-                        "Ref": 
-                            "SAPHANAIP"
-                            }
-                       ]
-               }
+            "Properties": {
+                "HostedZoneName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "SAPHANAHostname"
+                            },
+                            ".",
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A",
+                "TTL": "30",
+                "ResourceRecords": [
+                    {
+                        "Ref": "SAPHANAIP"
+                    }
+                ]
+            }
         },
-        "SAPPASR53Record" : {
-            "Type" : "AWS::Route53::RecordSet",
+        "SAPPASR53Record": {
+            "Type": "AWS::Route53::RecordSet",
             "DependsOn": "HostedZone",
-            "Properties" : {
-                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
-                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPPASHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
-                "Type" : "A",
-                "TTL" : "30",
-                "ResourceRecords" : [ {
+            "Properties": {
+                "HostedZoneName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "SAPPASHostname"
+                            },
+                            ".",
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A",
+                "TTL": "30",
+                "ResourceRecords": [
+                    {
                         "Fn::GetAtt": [
                             "SAPPASInstance",
                             "PrivateIp"
@@ -1582,7 +1635,6 @@
                     "SIDadmUID": {
                         "Ref": "SIDadmUID"
                     },
-
                     "VPCID": {
                         "Ref": "VPCID"
                     }

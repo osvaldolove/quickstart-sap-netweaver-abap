@@ -315,13 +315,13 @@
             "Type": "String"
         },
         "HostedZoneName": {
-         "Description":"A R53 privated hosted zone will be created. Use a fully-qualified domain name.",
-         "Type":"String",
-         "MinLength":"1",
-         "MaxLength":"64",
-         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
-         "ConstraintDescription":"must be a valid fully-qualified domain name.",
-         "Default":"mycompany.com"
+            "Description": "A R53 privated hosted zone will be created. Use a fully-qualified domain name.",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "64",
+            "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
+            "ConstraintDescription": "must be a valid fully-qualified domain name.",
+            "Default": "mycompany.com"
         },
         "InstallRDPAndBastionInstance": {
             "AllowedValues": [

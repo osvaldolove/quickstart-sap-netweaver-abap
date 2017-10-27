@@ -163,13 +163,13 @@
             ]
         },
         "HostedZoneName": {
-         "Description":"Name of an *existing* R53 privated hosted zone. Use a fully-qualified domain name.",
-         "Type":"String",
-         "MinLength":"1",
-         "MaxLength":"64",
-         "AllowedPattern":"(?!-)[a-zA-Z0-9-.]*(?<!-)",
-         "ConstraintDescription":"must be a valid fully-qualified domain name.",
-         "Default":"mycompany.com"
+            "Description": "Name of an *existing* R53 privated hosted zone. Use a fully-qualified domain name.",
+            "Type": "String",
+            "MinLength": "1",
+            "MaxLength": "64",
+            "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
+            "ConstraintDescription": "must be a valid fully-qualified domain name.",
+            "Default": "mycompany.com"
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -347,7 +347,7 @@
                 "Yes"
             ]
         }
-      },
+    },
     "Mappings": {
         "SAPAMINameMap": {
             "Red-Hat-Enterprise-Linux-6.6-HVM": {
@@ -552,14 +552,39 @@
                 ]
             }
         },
-        "SAPAASR53Record" : {
-            "Type" : "AWS::Route53::RecordSet",
-            "Properties" : {
-                "HostedZoneName" : { "Fn::Join" : [ "", [{"Ref" : "HostedZoneName"}, "." ]]},
-                "Name" : { "Fn::Join" : [ "", [ {"Ref" : "SAPAASHostname"}, ".", {"Ref" : "HostedZoneName"} ,"."]]},
-                "Type" : "A",
-                "TTL" : "30",
-                "ResourceRecords" : [ {
+        "SAPAASR53Record": {
+            "Type": "AWS::Route53::RecordSet",
+            "Properties": {
+                "HostedZoneName": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "SAPAASHostname"
+                            },
+                            ".",
+                            {
+                                "Ref": "HostedZoneName"
+                            },
+                            "."
+                        ]
+                    ]
+                },
+                "Type": "A",
+                "TTL": "30",
+                "ResourceRecords": [
+                    {
                         "Fn::GetAtt": [
                             "SAPAASInstance",
                             "PrivateIp"
