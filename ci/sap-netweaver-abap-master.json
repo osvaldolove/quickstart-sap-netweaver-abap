@@ -4,7 +4,11 @@
         "ParameterValue": "$[taskcat_getaz_2]"
     },
     {
-        "ParameterKey": "AutoRecovery",
+        "ParameterKey": "AutoRecoveryAAS",
+        "ParameterValue": "Yes"
+    },
+    {
+        "ParameterKey": "AutoRecoveryPAS",
         "ParameterValue": "Yes"
     },
     {
