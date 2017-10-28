@@ -68,6 +68,7 @@
                     "Parameters": [
                         "SAPAASHostname",
                         "AASMyInstanceType",
+                        "PrivateSubnetID",
                         "AutoRecoveryAAS",
                         "InstallSAPAAS"
                     ]
@@ -112,6 +113,9 @@
                 },
                 "MyOS": {
                     "default": "O.S. version for SAP Servers (SLES only)"
+                },
+                "PrivateSubnetID": {
+                    "default": "AAS Private Subnet ID"
                 },
                 "PrivateSubnet2CIDR": {
                     "default": "2nd Private Subnet CIDR"
@@ -221,7 +225,7 @@
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
             "ConstraintDescription": "must be a valid fully-qualified domain name.",
-            "Default": "mycompany.com"
+            "Default": "mycompany.local"
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -275,6 +279,11 @@
             "Default": "SuSE-Linux-12-SP1-HVM",
             "Description": "Operating system (SLES only) version for SAP servers.",
             "Type": "String"
+        },
+        "PrivateSubnetID": {
+            "AllowedPattern": "subnet-[0-9a-z]{8}",
+            "Description": "Private subnet to deploy SAP Addtln. App Server .",
+            "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet1AID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
@@ -1154,31 +1163,11 @@
             "Type": "AWS::Route53::RecordSet",
             "DependsOn": "HostedZone",
             "Properties": {
-                "HostedZoneName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "HostedZoneName"
-                            },
-                            "."
-                        ]
-                    ]
+                "HostedZoneId": {
+                    "Ref": "HostedZone"
                 },
                 "Name": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "SAPHANAHostname"
-                            },
-                            ".",
-                            {
-                                "Ref": "HostedZoneName"
-                            },
-                            "."
-                        ]
-                    ]
+                    "Fn::Sub": "${SAPHANAHostname}.${HostedZoneName}"
                 },
                 "Type": "A",
                 "TTL": "30",
@@ -1193,31 +1182,11 @@
             "Type": "AWS::Route53::RecordSet",
             "DependsOn": "HostedZone",
             "Properties": {
-                "HostedZoneName": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "HostedZoneName"
-                            },
-                            "."
-                        ]
-                    ]
+                "HostedZoneId": {
+                    "Ref": "HostedZone"
                 },
                 "Name": {
-                    "Fn::Join": [
-                        "",
-                        [
-                            {
-                                "Ref": "SAPPASHostname"
-                            },
-                            ".",
-                            {
-                                "Ref": "HostedZoneName"
-                            },
-                            "."
-                        ]
-                    ]
+                    "Fn::Sub": "${SAPPASHostname}.${HostedZoneName}"
                 },
                 "Type": "A",
                 "TTL": "30",
@@ -1563,9 +1532,13 @@
                     "AutoRecovery": {
                         "Ref": "AutoRecoveryAAS"
                     },
+                    "HostedZoneID": {
+                        "Ref": "HostedZone"
+                    },
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"
                     },
+
                     "InstallSAP": {
                         "Ref": "InstallSAP"
                     },
@@ -1581,11 +1554,8 @@
                     "PrivateSubnet1CIDR": {
                         "Ref": "PrivateSubnet1CIDR"
                     },
-                    "PrivateSubnet1AID": {
-                        "Ref": "PrivateSubnet1AID"
-                    },
-                    "PrivateSubnet2AID": {
-                        "Ref": "PrivateSubnet2AID"
+                    "PrivateSubnetID": {
+                        "Ref": "PrivateSubnetID"
                     },
                     "PrivateSubnet2CIDR": {
                         "Ref": "PrivateSubnet2CIDR"

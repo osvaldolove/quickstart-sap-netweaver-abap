@@ -70,10 +70,10 @@
                         "default": ""
                     },
                     "Parameters": [
-                        "InstallSAPAAS",
-                        "AutoRecoveryAAS",
+                        "SAPAASHostname",
                         "AASMyInstanceType",
-                        "SAPAASHostname"
+                        "AutoRecoveryAAS",
+                        "InstallSAPAAS"
                     ]
                 },
                 {
@@ -321,7 +321,7 @@
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
             "ConstraintDescription": "must be a valid fully-qualified domain name.",
-            "Default": "mycompany.com"
+            "Default": "mycompany.local"
         },
         "InstallRDPAndBastionInstance": {
             "AllowedValues": [
