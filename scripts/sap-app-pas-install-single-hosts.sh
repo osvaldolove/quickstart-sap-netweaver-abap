@@ -768,7 +768,9 @@ else
      then
           echo "ASCS installed after 2nd retry..."
      else
-          /root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry...SAP_UP= "$_SAP_UP" "
+     	  _ERR_LOG=$(find /tmp -type f -name "sapinst_dev.log")
+	  _PASS_ERR=$(grep ERR "$_ERR_LOG" | grep -i password)
+          /root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry...password error?= "$_PASS_ERR" "
           exit 1
      fi
 
