@@ -767,6 +767,12 @@
                     "MyOS": {
                         "Ref": "MyOS"
                     },
+                    "PrivateSubnetID": {
+                        "Fn::GetAtt": [
+                            "VPCStack",
+                            "Outputs.PrivateSubnet1AID"
+                        ]
+                    },
                     "PrivateSubnet1CIDR": {
                         "Fn::GetAtt": [
                             "VPCStack",
