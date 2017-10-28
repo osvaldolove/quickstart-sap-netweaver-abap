@@ -400,7 +400,7 @@ set_ini_file () {
                 set_cleanup_temp_PAS
                 set_cleanup_aasinifile
                 #signal the waithandler, 1=Failure
-                /root/install/signalFinalStatus.sh 1 "There is not INI_FILE for silent SAP Install - Failure"
+                /root/install/signalFinalStatus.sh 1 "There is no INI_FILE for silent SAP Install - Failure"
 		echo 1
                 exit 1
 	fi
@@ -716,5 +716,7 @@ else
 	set_cleanup_temp_PAS
 	set_cleanup_aasinifile
 	#signal the waithandler, 0=Success
-        /root/install/signalFinalStatus.sh 1 "Failed to installed SAP. SAP_UP value is: $_SAP_UP"
+	_ERR_LOG=$(find /tmp -type f -name "sapinst_dev.log")
+	_PASS_ERR=$(grep ERR "$_ERR_LOG" | grep -i password)
+	/root/install/signalFinalStatus.sh 1 "SAP ASCS install RETRY Failed...ASCS not installed 2nd retry...password error?= "$_PASS_ERR" "
 fi
