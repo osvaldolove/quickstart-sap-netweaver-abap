@@ -19,6 +19,9 @@ then
 	echo 1
 	exit 1
 else
+	#temporary CFN init testing...just quickly post success and exit
+	/root/install/signalFinalStatus.sh 0 "Download-script found...exiting from PAS download script without installing"
+	exit
 	sleep 30
 	cd /root/install
 	bash -x /root/install/sap-app-pas-install-single-hosts.sh | tee -a /root/install/sap-app-pas-install-single-hosts-out.log
