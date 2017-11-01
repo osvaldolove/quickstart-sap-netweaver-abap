@@ -19,21 +19,25 @@ then
 	echo 1
 	exit 1
 else
-	#temporary CFN init testing...just quickly post success and exit
-	/root/install/signalFinalStatus.sh 0 "Download-script found...exiting from PAS download script without installing"
-	exit
-	sleep 30
-	cd /root/install
-	bash -x /root/install/sap-app-pas-install-single-hosts.sh | tee -a /root/install/sap-app-pas-install-single-hosts-out.log
-	if [ $? -ne 0 ] 
+	if [[ "$REGION" == "ap-south-1" -o "$REGION" == "ap-southeast-1"  -o "$REGION" == "ap-northeast-2"  -o "$REGION" == "us-west-2"  -o "$REGION" == "us-east-1" ]]	
 	then
-	 	/root/install/signalFinalStatus.sh 1 "Install-script did not execute correctly...check: /var/log directories for error message"
-		echo 1
-		exit 1
+		sleep 30
+		cd /root/install
+		bash -x /root/install/sap-app-pas-install-single-hosts.sh | tee -a /root/install/sap-app-pas-install-single-hosts-out.log
+		if [ $? -ne 0 ] 
+		then
+	 		/root/install/signalFinalStatus.sh 1 "Install-script did not execute correctly...check: /var/log directories for error message"
+			echo 1
+			exit 1
+		else
+			mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket 
+			echo 0
+			exit 0
+		fi
 	else
-		mv /var/run/dbus/system_bus_socket.bak /var/run/dbus/system_bus_socket 
-		echo 0
-		exit 0
+		#temporary CFN init testing...just quickly post success and exit
+		/root/install/signalFinalStatus.sh 0 "Download-script found...exiting from PAS download script without installing"
+		exit
 	fi
 fi
 
