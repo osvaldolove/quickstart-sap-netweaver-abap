@@ -379,7 +379,12 @@
                 "SuSE-Linux-11-SP4-HVM",
                 "SuSE-Linux-12-HVM",
                 "SuSE-Linux-12-SP1-HVM",
-                "SuSE-Linux-12-SP2-HVM"
+                "SuSE-Linux-12-SP2-HVM",
+                "SuSE-Linux-12-SP1-For-SAP-HVM",
+                "SuSE-Linux-12-SP2-For-SAP-HVM",
+                "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM",
+                "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM",
+                "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM"
             ],
             "Default": "SuSE-Linux-12-SP1-HVM",
             "Description": "Operating system (SLES only) version for SAP servers.",
@@ -395,7 +400,13 @@
                 "Red-Hat-Enterprise-Linux-7.2-HVM",
                 "SuSE-Linux-11-SP4-HVM",
                 "SuSE-Linux-12-HVM",
-                "SuSE-Linux-12-SP1-HVM"
+                "SuSE-Linux-12-SP1-HVM",
+                "SuSE-Linux-12-SP2-HVM",
+                "SuSE-Linux-12-SP1-For-SAP-HVM",
+                "SuSE-Linux-12-SP2-For-SAP-HVM",
+                "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM",
+                "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM",
+                "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM"
             ]
         },
         "PrivateSubnet1CIDR": {
@@ -542,26 +553,6 @@
         }
     },
     "Mappings": {
-        "SAPHANAOSNameMap": {
-            "Red-Hat-Enterprise-Linux-6.6-HVM": {
-                "Code": "RedHatLinux66"
-            },
-            "Red-Hat-Enterprise-Linux-6.7-HVM": {
-                "Code": "RedHatLinux67"
-            },
-            "Red-Hat-Enterprise-Linux-7.2-HVM": {
-                "Code": "RedHatLinux72"
-            },
-            "SuSE-Linux-11-SP4-HVM": {
-                "Code": "SuSELinux11SP4"
-            },
-            "SuSE-Linux-12-HVM": {
-                "Code": "SuSELinux12"
-            },
-            "SuSE-Linux-12-SP1-HVM": {
-                "Code": "SuSELinux12SP1"
-            }
-        }
     },
     "Resources": {
         "VPCStack": {
@@ -663,9 +654,6 @@
                     "AASMyInstanceType": {
                         "Ref": "AASMyInstanceType"
                     },
-                    "BASTIONInstanceType": {
-                        "Ref": "BASTIONInstanceType"
-                    },
                     "Encryption": {
                         "Ref": "Encryption"
                     },
@@ -684,7 +672,7 @@
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"
                     },
-                    "InstallRDPAndBastionInstance": {
+                    "InstallRDPInstance": {
                         "Ref": "InstallRDPAndBastionInstance"
                     },
                     "InstallSAPAAS": {
