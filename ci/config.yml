@@ -3,7 +3,6 @@ global:
   owner: somckitk@amazon.com
   qsname: quickstart-sap-netweaver-abap
   regions:
-    - eu-central-1
     - eu-west-1
     - us-east-1
     - us-east-2
