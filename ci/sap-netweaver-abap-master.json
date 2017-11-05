@@ -61,7 +61,7 @@
     },
     {
         "ParameterKey": "HANAInstanceType",
-        "ParameterValue": "r4.4xlarge"
+        "ParameterValue": "r4.2xlarge"
     },
     {
         "ParameterKey": "MyOS",
