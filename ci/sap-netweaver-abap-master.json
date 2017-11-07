@@ -41,7 +41,7 @@
     },
     {
         "ParameterKey": "HANAMasterPass",
-        "ParameterValue": "$[taskcat_genpass_12]"
+        "ParameterValue": "SAP9nineaws"
     },
     {
         "ParameterKey": "InstallSAP",
