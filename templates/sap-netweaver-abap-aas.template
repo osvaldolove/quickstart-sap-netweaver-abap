@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP Additional Applicaiton Server (qs-1no61sjl2)",
+    "Description": "Deploy SAP Additional Application Server (qs-1no61sjl2)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
