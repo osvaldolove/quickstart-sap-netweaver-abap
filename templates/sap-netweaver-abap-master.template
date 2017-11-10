@@ -64,7 +64,7 @@
                 },
                 {
                     "Label": {
-                        "default": "SAP Addtln. App Server setup and configuration"
+                        "default": "SAP Additional App Server setup and configuration"
                     },
                     "Description": {
                         "default": ""
@@ -104,7 +104,7 @@
             ],
             "ParameterLabels": {
                 "AASMyInstanceType": {
-                    "default": "SAP Addtln. App Server instance type"
+                    "default": "SAP Additional App Server instance type"
                 },
                 "AutoRecoveryAAS": {
                     "default": "EC2 Auto Recovery"
@@ -140,7 +140,7 @@
                     "default": "Install SAP software"
                 },
                 "InstallSAPAAS": {
-                    "default": "Install SAP Addtln. App Server"
+                    "default": "Install SAP Additional App Server"
                 },
                 "KeyName": {
                     "default": "SSH key pair"
@@ -179,7 +179,7 @@
                     "default": "CIDR block for RDP & Bastion access"
                 },
                 "SAPAASHostname": {
-                    "default": "SAP A.A.S. Server host name (i.e. sapaas00)"
+                    "default": "SAP AAS Server host name (i.e. sapaas00)"
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
@@ -194,7 +194,7 @@
                     "default": "SAP instance number"
                 },
                 "SAPPASHostname": {
-                    "default": "SAP P.A.S. Server host name (i.e. sappas00)"
+                    "default": "SAP PAS Server host name (i.e. sappas00)"
                 },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
@@ -315,13 +315,12 @@
             "Type": "String"
         },
         "HostedZoneName": {
-            "Description": "A R53 privated hosted zone will be created. Use a fully-qualified domain name.",
+            "Description": "A R53 privated hosted zone will be created. Use a fully-qualified domain name e.g. mycompany.local",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
-            "ConstraintDescription": "must be a valid fully-qualified domain name.",
-            "Default": "mycompany.local"
+            "ConstraintDescription": "must be a valid fully-qualified domain name."
         },
         "InstallRDPAndBastionInstance": {
             "AllowedValues": [
@@ -347,7 +346,7 @@
                 "No"
             ],
             "Default": "No",
-            "Description": "Install (Yes) or (No) don't install SAP Addtln. App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
+            "Description": "Install (Yes) or (No) don't install SAP Additional App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
             "Type": "String"
         },
         "KeyName": {
@@ -472,7 +471,7 @@
         },
         "SAPAASHostname": {
             "Default": "sapaas00",
-            "Description": "Host name *template* to use for SAP A.A.S Server",
+            "Description": "Host name *template* to use for SAP AAS Server",
             "Type": "String"
         },
         "SAPHANAHostname": {
@@ -498,7 +497,7 @@
         },
         "SAPPASHostname": {
             "Default": "sappas00",
-            "Description": "Host name to use for SAP P.A.S Server (DNS short name).",
+            "Description": "Host name to use for SAP PAS Server (DNS short name).",
             "Type": "String"
         },
         "SAPTZ": {

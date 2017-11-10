@@ -93,16 +93,16 @@
                     "default": "Private Subnet ID"
                 },
                 "PrivateSubnet1CIDR": {
-                    "default": "1st Private Subnet CIDR"
+                    "default": "Private Subnet 1 CIDR"
                 },
                 "PrivateSubnet2CIDR": {
-                    "default": "2nd Private Subnet CIDR"
+                    "default": "Private Subnet 2 CIDR"
                 },
                 "PublicSubnet1CIDR": {
-                    "default": "1st Public Subnet CIDR"
+                    "default": "Public Subnet 1 CIDR"
                 },
                 "PublicSubnet2CIDR": {
-                    "default": "2nd Public Subnet CIDR"
+                    "default": "Public Subnet 2 CIDR"
                 },
                 "QSS3BucketName": {
                     "default": "S3 bucket name for the Quick Start assets."
@@ -111,16 +111,13 @@
                     "default": "S3 key prefix for the Quick Start assets"
                 },
                 "SAPAASHostname": {
-                    "default": "SAP A.A.S Server hostname"
-                },
-                "SAPASGHostcount": {
-                    "default": "Max. number of servers in the Autoscaling group"
+                    "default": "SAP AAS Server hostname"
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server hostname"
                 },
                 "SAPHANAIP": {
-                    "default": "SAP HANA Server I.P."
+                    "default": "SAP HANA Server IP Address"
                 },
                 "SAPInstanceNum": {
                     "default": "SAP instance number"
@@ -129,10 +126,10 @@
                     "default": "Existing EC2 SSM parameter store name"
                 },
                 "SAPPASHostname": {
-                    "default": "SAP P.A.S server hostname"
+                    "default": "SAP PAS server hostname"
                 },
                 "SAPPASIP": {
-                    "default": "SAP P.A.S server I.P."
+                    "default": "SAP PAS server IP Address"
                 },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
@@ -164,13 +161,12 @@
             "Type": "AWS::Route53::HostedZone::Id"
         },
         "HostedZoneName": {
-            "Description": "An *existing* R53 privated hosted zone name. Hint: See name in Zone Id.",
+            "Description": "An *existing* R53 privated hosted zone name e.g. mycompany.local. Hint: See name in Zone Id.",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
-            "ConstraintDescription": "must be a valid fully-qualified domain name.",
-            "Default": "mycompany.local"
+            "ConstraintDescription": "must be a valid fully-qualified domain name."
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -223,7 +219,7 @@
         },
         "PrivateSubnetID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "Private subnet to deploy SAP Addtln. App Server .",
+            "Description": "Private subnet to deploy SAP Additional App Server.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet1CIDR": {
@@ -270,7 +266,7 @@
         },
         "SAPAASHostname": {
             "Default": "sapaas00",
-            "Description": "Host name to use for SAP A.A.S Server.",
+            "Description": "Host name to use for SAP AAS Server.",
             "Type": "String"
         },
         "SAPHANAHostname": {
@@ -280,7 +276,7 @@
         },
         "SAPHANAIP": {
             "Default": "10.0.x.x",
-            "Description": "I.P. address of the SAP HANA database (SAP App server must be able to access HANA server).",
+            "Description": "IP address of the SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
         "SAPInstanceNum": {
@@ -299,12 +295,12 @@
         },
         "SAPPASHostname": {
             "Default": "sappas00",
-            "Description": "Host name to use for SAP P.A.S Server (DNS short name). Can be the same as the ASCS server",
+            "Description": "Host name to use for SAP PAS Server (DNS short name). Can be the same as the ASCS server",
             "Type": "String"
         },
         "SAPPASIP": {
             "Default": "10.0.x.x",
-            "Description": "IP Address of SAP P.A.S Server. Can be the same as the ASCS server",
+            "Description": "IP Address of SAP PAS Server. Can be the same as the ASCS server",
             "Type": "String"
         },
         "SAPTZ": {

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP HANA + App Server Cluster (ASCS, PAS & DB instance) + Addtln. App Server (qs-1no61sjkr)",
+    "Description": "Deploy SAP HANA + App Server Cluster (ASCS, PAS & DB instance) + Additional App Server (qs-1no61sjkr)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -70,7 +70,7 @@
                 },
                 {
                     "Label": {
-                        "default": "SAP Addtln. App Server setup and configuration"
+                        "default": "SAP Additional App Server setup and configuration"
                     },
                     "Description": {
                         "default": ""
@@ -110,7 +110,7 @@
             ],
             "ParameterLabels": {
                 "AASMyInstanceType": {
-                    "default": "SAP Addtln. App Server instance type"
+                    "default": "SAP Additional App Server instance type"
                 },
                 "AutoRecoveryAAS": {
                     "default": "EC2 Auto Recovery"
@@ -143,7 +143,7 @@
                     "default": "Install SAP software"
                 },
                 "InstallSAPAAS": {
-                    "default": "Install SAP Addtln. App Server"
+                    "default": "Install SAP Additional App Server"
                 },
                 "KeyName": {
                     "default": "SSH key pair"
@@ -191,16 +191,16 @@
                     "default": "S3 key prefix for the Quick Start assets"
                 },
                 "SAPPASHostname": {
-                    "default": "SAP P.A.S. Server host name (i.e. sappas00)"
+                    "default": "SAP PAS Server host name (i.e. sappas00)"
                 },
                 "SAPAASHostname": {
-                    "default": "SAP A.A.S. Server host name (i.e. sapaas00)"
+                    "default": "SAP AAS Server host name (i.e. sapaas00)"
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
                 },
                 "SAPHANAIP": {
-                    "default": "SAP HANA Server I.P."
+                    "default": "SAP HANA Server IP Address"
                 },
                 "SAPInstallMediaBucket": {
                     "default": "S3 bucket for SAP s/w"
@@ -314,13 +314,12 @@
             "Type": "String"
         },
         "HostedZoneName": {
-            "Description": "A *new* R53 privated hosted zone will be created. Use a fully-qualified domain name.",
+            "Description": "A *new* R53 private hosted zone will be created. Use a fully-qualified domain name e.g. mycompany.local",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
-            "ConstraintDescription": "must be a valid fully-qualified domain name.",
-            "Default": "mycompany.local"
+            "ConstraintDescription": "must be a valid fully-qualified domain name."
         },
         "InstallRDPInstance": {
             "AllowedValues": [
@@ -346,11 +345,10 @@
                 "No"
             ],
             "Default": "No",
-            "Description": "Install (Yes) or (No) don't install SAP Addtln. App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
+            "Description": "Install (Yes) or (No) don't install SAP Additional App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
             "Type": "String"
         },
         "KeyName": {
-            "Default": "home",
             "Description": "Name of an existing Amazon EC2 key pair. All instances will launch with this key pair.",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
@@ -410,7 +408,7 @@
         },
         "PrivateSubnetID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "Private subnet to deploy SAP Addtln. App Server .",
+            "Description": "Private subnet to deploy SAP Additional App Server.",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet1AID": {
@@ -427,7 +425,6 @@
         },
         "PrivateSubnet2AID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Default": "subnet-xxxxxxxx",
             "Description": "The existing private subnet #2 in your VPC where you want to deploy SAP App Server Cluster",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -489,7 +486,7 @@
         },
         "SAPAASHostname": {
             "Default": "sapaas00",
-            "Description": "Host name to use for SAP A.A.S Server.",
+            "Description": "Host name to use for SAP AAS Server.",
             "Type": "String"
         },
         "SAPHANAHostname": {
@@ -499,7 +496,7 @@
         },
         "SAPHANAIP": {
             "Default": "10.0.x.x",
-            "Description": "I.P. address of the SAP HANA database (SAP App server must be able to access HANA server).",
+            "Description": "IP address of the SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
         "SAPInstallMediaBucket": {
@@ -520,7 +517,7 @@
         },
         "SAPPASHostname": {
             "Default": "sappas00",
-            "Description": "Host name to use for SAP P.A.S Server (DNS short name).",
+            "Description": "Host name to use for SAP PAS Server (DNS short name).",
             "Type": "String"
         },
         "SAPNetWeaverPass": {
