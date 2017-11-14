@@ -716,12 +716,6 @@
                             "Outputs.PrivateSubnet1AID"
                         ]
                     },
-                    "PrivateSubnet2AID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PrivateSubnet2AID"
-                        ]
-                    },
                     "PublicSubnet1CIDR": {
                         "Fn::GetAtt": [
                             "VPCStack",
@@ -738,12 +732,6 @@
                         "Fn::GetAtt": [
                             "VPCStack",
                             "Outputs.PublicSubnet1ID"
-                        ]
-                    },
-                    "PublicSubnet2ID": {
-                        "Fn::GetAtt": [
-                            "VPCStack",
-                            "Outputs.PublicSubnet2ID"
                         ]
                     },
                     "QSS3BucketName": {
