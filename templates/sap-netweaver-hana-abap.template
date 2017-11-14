@@ -18,9 +18,7 @@
                         "PublicSubnet1CIDR",
                         "PublicSubnet2CIDR",
                         "PrivateSubnet1AID",
-                        "PrivateSubnet2AID",
-                        "PublicSubnet1ID",
-                        "PublicSubnet2ID"
+                        "PublicSubnet1ID"
                     ]
                 },
                 {
@@ -39,7 +37,9 @@
                         "Encryption",
                         "VolumeType",
                         "KeyName",
-                        "HANAInstallMedia"
+                        "HANAInstallMedia",
+                        "EnableLogging",
+                        "CloudTrailS3Bucket"
                     ]
                 },
                 {
@@ -118,6 +118,12 @@
                 "AutoRecoveryPAS": {
                     "default": "EC2 Auto Recovery"
                 },
+                "CloudTrailS3Bucket": {
+                    "default": "S3 bucket for AWS CloudTrail & Config logs"
+                },
+                "EnableLogging": {
+                    "default": "Enable AWS CloudTrail Trail & Config logs"
+                },
                 "Encryption": {
                     "default": "Enable encryption"
                 },
@@ -166,14 +172,8 @@
                 "PrivateSubnet1CIDR": {
                     "default": "1st Private Subnet CIDR"
                 },
-                "PrivateSubnet2AID": {
-                    "default": "2nd Private Subnet ID"
-                },
                 "PrivateSubnet1AID": {
                     "default": "1st Private Subnet ID"
-                },
-                "PublicSubnet2ID": {
-                    "default": "2nd Public Subnet ID"
                 },
                 "PublicSubnet1ID": {
                     "default": "1st Public Subnet ID"
@@ -266,6 +266,20 @@
             "Default": "r4.xlarge",
             "Description": "Instance type for SAP AAS Servers.",
             "Type": "String"
+        },
+        "CloudTrailS3Bucket": {
+            "Description": "Name of Amazon S3 bucket where AWS CloudTrail Trail and AWS Config logs can be stored (e.g. mycloudtrail).",
+            "Default": "",
+            "Type": "String"
+        },
+        "EnableLogging": {
+            "Description": "Enable (Yes) or disable (No) logging with AWS CloudTrail and AWS Config",
+            "Default": "No",
+            "Type": "String",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
         },
         "Encryption": {
             "AllowedValues": [
@@ -423,11 +437,6 @@
             "Description": "CIDR block for private subnet 1 located in Availability Zone 1",
             "Type": "String"
         },
-        "PrivateSubnet2AID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "The existing private subnet #2 in your VPC where you want to deploy SAP App Server Cluster",
-            "Type": "AWS::EC2::Subnet::Id"
-        },
         "PrivateSubnet2CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
@@ -453,11 +462,6 @@
             "Default": "10.0.144.0/20",
             "Description": "CIDR block for the public (DMZ) subnet 2 located in Availability Zone 2",
             "Type": "String"
-        },
-        "PublicSubnet2ID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "The existing public subnet #2 in your VPC where your linux bastion and RDP are deployed.",
-            "Type": "AWS::EC2::Subnet::Id"
         },
         "QSS3BucketName": {
             "AllowedPattern": "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$",
