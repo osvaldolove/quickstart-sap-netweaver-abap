@@ -622,6 +622,16 @@ else
 	exit 1
 fi
 
+if [ "$INSTALL_SAP" == "No" ]
+then
+	echo "Completed setting up SAP App Server Infrastrucure."
+	echo "Exiting as the option to install SAP software was set to: $INSTALL_SAP"
+	#signal the waithandler, 0=Success
+	/root/install/signalFinalStatus.sh 0 "Finished. Exiting as the option to install SAP software was set to: $INSTALL_SAP"
+	exit 0
+
+fi
+
 _SET_AUTOFS=$(set_autofs)
 
 _AUTOFS=$(df -h $SAPMNT | awk '{ print $NF }' | tail -1)
@@ -653,15 +663,6 @@ else
 fi
 
 
-if [ "$INSTALL_SAP" == "No" ]
-then
-	echo "Completed setting up SAP App Server Infrastrucure."
-	echo "Exiting as the option to install SAP software was set to: $INSTALL_SAP"
-	#signal the waithandler, 0=Success
-	/root/install/signalFinalStatus.sh 0 "Finished. Exiting as the option to install SAP software was set to: $INSTALL_SAP"
-	exit 0
-
-fi
 
 ###Execute sapinst###
 
