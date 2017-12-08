@@ -412,12 +412,8 @@
                 "SuSE-Linux-11-SP4-HVM",
                 "SuSE-Linux-12-HVM",
                 "SuSE-Linux-12-SP1-HVM",
-                "SuSE-Linux-12-SP2-HVM",
                 "SuSE-Linux-12-SP1-For-SAP-HVM",
-                "SuSE-Linux-12-SP2-For-SAP-HVM",
-                "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM",
-                "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM",
-                "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM"
+                "SuSE-Linux-12-SP2-For-SAP-HVM"
             ]
         },
         "PrivateSubnetID": {
