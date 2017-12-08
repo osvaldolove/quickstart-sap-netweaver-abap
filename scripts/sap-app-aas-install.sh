@@ -541,30 +541,6 @@ else
 fi
 
 
-#MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $NF}')
-#INVALID_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}')
-MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $4}')
-INVALID_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}')
-
-if [ "$INVALID_MP" == "INVALIDPARAMETERS" ]
-then
-	echo "Invalid encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
-	#signal the waithandler, 1=Failed
-        /root/install/signalFinalStatus.sh 1 "Invalid SSM Parameter Store...exiting"
-	set_cleanup_aasinifile
-	exit 1
-fi
-
-if [ -z "$MP" ]
-then
-	echo "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
-	#signal the waithandler, 1=Failed
-        /root/install/signalFinalStatus.sh 1 "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
-	set_cleanup_aasinifile
-	exit 1
-fi
-
-
 _SET_UUIDD=$(set_uuidd)
 
 if [ "$_SET_UUIDD" == 0 ]
@@ -645,6 +621,28 @@ then
 	exit 0
 
 fi
+
+MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $4}')
+INVALID_MP=$(aws ssm get-parameters --names $SSM_PARAM_STORE --with-decryption --region $REGION --output text | awk '{ print $1}')
+
+if [ "$INVALID_MP" == "INVALIDPARAMETERS" ]
+then
+	echo "Invalid encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
+	#signal the waithandler, 1=Failed
+        /root/install/signalFinalStatus.sh 1 "Invalid SSM Parameter Store...exiting"
+	set_cleanup_aasinifile
+	exit 1
+fi
+
+if [ -z "$MP" ]
+then
+	echo "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
+	#signal the waithandler, 1=Failed
+        /root/install/signalFinalStatus.sh 1 "Could not read encrypted SSM Parameter store: $SSM_PARAM_STORE...exiting"
+	set_cleanup_aasinifile
+	exit 1
+fi
+
 
 _SET_AUTOFS=$(set_autofs)
 
