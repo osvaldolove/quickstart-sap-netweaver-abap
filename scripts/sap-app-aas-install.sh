@@ -622,6 +622,20 @@ else
 	exit 1
 fi
 
+_SET_AWSDP=$(set_awsdataprovider)
+
+if [ "$_SET_AWSDP" == 0 ]
+then
+	echo "Successfully installed AWS Data Provider"
+else
+	echo "FAILED to install AWS Data Provider...exiting"
+	#signal the waithandler, 1=Failed
+        /root/install/signalFinalStatus.sh 1 "Failed to install AWS Data Provider...exiting"
+	set_cleanup_aasinifile
+	exit 1
+fi
+
+
 if [ "$INSTALL_SAP" == "No" ]
 then
 	echo "Completed setting up SAP App Server Infrastrucure."
@@ -647,21 +661,6 @@ else
 	set_cleanup_aasinifile
 	exit 1
 fi
-
-
-_SET_AWSDP=$(set_awsdataprovider)
-
-if [ "$_SET_AWSDP" == 0 ]
-then
-	echo "Successfully installed AWS Data Provider"
-else
-	echo "FAILED to install AWS Data Provider...exiting"
-	#signal the waithandler, 1=Failed
-        /root/install/signalFinalStatus.sh 1 "Failed to install AWS Data Provider...exiting"
-	set_cleanup_aasinifile
-	exit 1
-fi
-
 
 
 ###Execute sapinst###
