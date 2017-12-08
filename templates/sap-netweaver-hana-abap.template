@@ -54,7 +54,6 @@
                         "SAPPASHostname",
                         "SAPPASHostname",
                         "SAPHANAHostname",
-                        "SAPHANAIP",
                         "SID",
                         "SAPInstanceNum",
                         "SIDadmUID",
@@ -198,9 +197,6 @@
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
-                },
-                "SAPHANAIP": {
-                    "default": "SAP HANA Server IP Address"
                 },
                 "SAPInstallMediaBucket": {
                     "default": "S3 bucket for SAP s/w"
@@ -492,11 +488,6 @@
         "SAPHANAHostname": {
             "Default": "saphanaqs",
             "Description": "Host name to use for SAP HANA database (SAP App server must be able to access HANA server).",
-            "Type": "String"
-        },
-        "SAPHANAIP": {
-            "Default": "10.0.x.x",
-            "Description": "IP address of the SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
         "SAPInstallMediaBucket": {
