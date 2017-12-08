@@ -1631,7 +1631,10 @@
                                             "\n",
                                             "export DBIP=",
                                             {
-                                                "Ref": "SAPHANAIP"
+                                                "Fn::GetAtt": [
+                                                    "HANAStack",
+                                                    "Outputs.HANAMasterInstanceIP"
+                                                ]
                                             },
                                             "\n",
                                             "export MyOS=",
@@ -1924,7 +1927,10 @@
                         "Ref": "SAPHANAHostname"
                     },
                     "SAPHANAIP": {
-                        "Ref": "SAPHANAIP"
+                        "Fn::GetAtt": [
+                             "HANAStack",
+                             "Outputs.HANAMasterInstanceIP"
+                         ]
                     },
                     "SAPInstanceNum": {
                         "Ref": "SAPInstanceNum"
