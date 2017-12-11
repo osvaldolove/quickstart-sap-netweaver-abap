@@ -420,8 +420,9 @@ set_nfsexport() {
 
      if [ "$FS_SAPMNT" ]
      then
-          EXPORTS=$(echo $HOSTNAME | cut -c1-3)
-	  echo "$SAPMNT     $EXPORTS*(rw,no_root_squash,no_subtree_check)" >> /etc/exports
+          #EXPORTS=$(echo $HOSTNAME | cut -c1-3)
+	  #echo "$SAPMNT     $EXPORTS*(rw,no_root_squash,no_subtree_check)" >> /etc/exports
+	  echo "$SAPMNT      *(rw,no_root_squash,no_subtree_check)" >> /etc/exports
           chkconfig nfs on
           service nfsserver start
           echo "service nfsserver start" >> /etc/init.d/boot.local

@@ -324,30 +324,29 @@ set_autofs() {
 	fi
 
 
-	PAS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_PASIP" | awk '{ print $2 }')
+
+	#PAS_EC2ID=$(aws ec2 describe-instances --region $REGION --query 'Reservations[].Instances[].[PrivateIpAddress,InstanceId]' --output text | grep "$SAP_PASIP" | awk '{ print $2 }')
 
         #insert the hosts file entry
-	MY_IP=$( ip a | grep inet | grep eth0 | awk -F"/" '{ print $1 }' | awk '{ print $2 }')
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "add_host" --parameters commands="echo "${MY_IP}"    "${HOSTNAME}" >> /etc/hosts"  --region $REGION --output text
+	#MY_IP=$( ip a | grep inet | grep eth0 | awk -F"/" '{ print $1 }' | awk '{ print $2 }')
+	#aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "add_host" --parameters commands="echo "${MY_IP}"    "${HOSTNAME}" >> /etc/hosts"  --region $REGION --output text
 
-	sleep 5
 
 	#restart rpc.mountd on the PAS
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "restart mountd" --parameters commands="pkill rpc.mountd; /usr/sbin/rpc.mountd" --region $REGION --output text
+	#aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "restart mountd" --parameters commands="pkill rpc.mountd; /usr/sbin/rpc.mountd" --region $REGION --output text
 	
-	sleep 5
 
 	#restart the nscd 
-	aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart"  --region $REGION --output text
+	#aws ssm send-command --instance-ids  $PAS_EC2ID --document-name "AWS-RunShellScript" --comment "nscd_restart" --parameters commands="service nscd restart"  --region $REGION --output text
 
 
-	mount $SAPMNT
 
 	_DF=$(showmount -e "$SAP_PAS" | grep "$SAPMNT" | wc -l )
 
 	#check showmount 
 	if [ $_DF -eq 1 ]
 	then
+	        mount $SAPMNT
 		echo 0
 	else
 		echo 1
