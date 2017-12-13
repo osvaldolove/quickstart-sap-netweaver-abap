@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Autoscaling for AAS (qs-1no61sjkm)",
+    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + AAS (qs-1no61sjkm)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -37,7 +37,9 @@
                         "Encryption",
                         "VolumeType",
                         "KeyName",
-                        "HANAInstallMedia"
+                        "HANAInstallMedia",
+                        "EnableLogging",
+                        "CloudTrailS3Bucket"
                     ]
                 },
                 {
@@ -106,6 +108,9 @@
                 "AASMyInstanceType": {
                     "default": "SAP Additional App Server instance type"
                 },
+                "AvailabilityZones": {
+                    "default": "Availability Zones"
+                },
                 "AutoRecoveryAAS": {
                     "default": "EC2 Auto Recovery"
                 },
@@ -114,6 +119,12 @@
                 },
                 "BASTIONInstanceType": {
                     "default": "Bastion host"
+                },
+                "CloudTrailS3Bucket": {
+                    "default": "S3 bucket for AWS CloudTrail & AWS Config logs"
+                },
+                "EnableLogging": {
+                    "default": "Enable AWS CloudTrail & AWS Config logs"
                 },
                 "Encryption": {
                     "default": "Enable encryption"
@@ -268,6 +279,20 @@
             "Description": "Amazon EC2 instance type for the bastion host.",
             "Type": "String"
         },
+        "CloudTrailS3Bucket": {
+            "Description": "Name of Amazon S3 bucket where AWS CloudTrail Trail and AWS Config logs can be stored (e.g. mycloudtrail).",
+            "Default": "",
+            "Type": "String"
+        },
+        "EnableLogging": {
+            "Description": "Enable (Yes) or disable (No) logging with AWS CloudTrail and AWS Config",
+            "Default": "No",
+            "Type": "String",
+            "AllowedValues": [
+                "Yes",
+                "No"
+            ]
+        },
         "Encryption": {
             "AllowedValues": [
                 "Yes",
@@ -327,7 +352,7 @@
                 "Yes",
                 "No"
             ],
-            "Default": "No",
+            "Default": "Yes",
             "Description": "Install (Yes) or don't install (No) optional RDP & Bastion instances.",
             "Type": "String"
         },
@@ -645,6 +670,12 @@
                     },
                     "AASMyInstanceType": {
                         "Ref": "AASMyInstanceType"
+                    },
+                    "CloudTrailS3Bucket": {
+                        "Ref": "CloudTrailS3Bucket"
+                    },
+                    "EnableLogging": {
+                        "Ref": "EnableLogging"
                     },
                     "Encryption": {
                         "Ref": "Encryption"

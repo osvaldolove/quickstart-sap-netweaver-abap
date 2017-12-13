@@ -118,10 +118,10 @@
                     "default": "EC2 Auto Recovery"
                 },
                 "CloudTrailS3Bucket": {
-                    "default": "S3 bucket for AWS CloudTrail & Config logs"
+                    "default": "S3 bucket for AWS CloudTrail & AWS Config logs"
                 },
                 "EnableLogging": {
-                    "default": "Enable AWS CloudTrail Trail & Config logs"
+                    "default": "Enable AWS CloudTrail & AWS Config logs"
                 },
                 "Encryption": {
                     "default": "Enable encryption"
@@ -189,6 +189,9 @@
                 "QSS3KeyPrefix": {
                     "default": "S3 key prefix for the Quick Start assets"
                 },
+                "RDPInstanceType": {
+                    "default": "RDP Instance type"
+                },
                 "SAPPASHostname": {
                     "default": "SAP PAS Server host name (i.e. sappas00)"
                 },
@@ -218,6 +221,9 @@
                 },
                 "SAPNetWeaverPass": {
                     "default": "SAP NetWeaver password"
+                },
+                "VolumeType": {
+                    "default": "EBS storage volume type"
                 },
                 "VPCID": {
                     "default": "VPC ID"
