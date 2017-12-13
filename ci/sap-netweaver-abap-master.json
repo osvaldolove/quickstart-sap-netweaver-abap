@@ -65,7 +65,7 @@
     },
     {
         "ParameterKey": "MyOS",
-        "ParameterValue": "SuSE-Linux-12-SP1-HVM"
+        "ParameterValue": "SuSE-Linux-12-SP2-HVM"
     },
     {
         "ParameterKey": "MyOSHANA",
