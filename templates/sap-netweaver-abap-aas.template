@@ -1305,7 +1305,7 @@
                                 "       wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                                 "       gzip -df aws-cfn-bootstrap-latest.tar.gz\n",
                                 "       tar -xvf aws-cfn-bootstrap-latest.tar\n",
-                                "       ln -s /tmp/aws-cfn-bootstrap-1.4 /opt/aws\n",
+                                "       #ln -s /tmp/aws-cfn-bootstrap-1.4 /opt/aws\n",
                                 "       chmod -R 755 /tmp/aws-cfn-bootstrap-1.4\n",
                                 "       which pip &> /dev/null\n",
                                 "       if [ $? -ne 0 ] ;then\n",
@@ -1317,8 +1317,8 @@
                                 "       pip install --upgrade pip\n",
                                 "       pip install --upgrade setuptools\n",
                                 "       pip install awscli --ignore-installed six &> /dev/null\n",
-                                "       export PYTHONPATH=/opt/aws:$PYTHONPATH\n",
-                                "/opt/aws/bin/cfn-init -v ",
+                                "       export PYTHONPATH=/tmp/aws-cfn-bootstrap-1.4:$PYTHONPATH\n",
+                                "/tmp/aws-cfn-bootstrap-1.4/bin/cfn-init -v ",
                                 "         --stack ",
                                 {
                                     "Ref": "AWS::StackName"

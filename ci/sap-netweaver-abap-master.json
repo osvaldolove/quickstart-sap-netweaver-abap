@@ -49,7 +49,7 @@
     },
     {
         "ParameterKey": "InstallSAPAAS",
-        "ParameterValue": "No"
+        "ParameterValue": "Yes"
     },
     {
         "ParameterKey": "InstallRDPAndBastionInstance",
