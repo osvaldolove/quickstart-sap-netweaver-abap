@@ -611,14 +611,16 @@ echo "Start set_s3_download @ $(date)"
 echo
 _SET_S3=$(set_s3_download)
 
-S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
-S3_FILE_COUNT="3130"
+#removed below file download sanity check, will rely on set_s3_download to download all the files
 
-if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
-then
-     /root/install/signalFinalStatus.sh 1 " FAILED to set /usr/sap and /sapmnt...check your S3 SAP software bucket: "$S3_COUNT" "$S3_FILE_COUNT" " 
-     exit 1
-fi
+#S3_COUNT=$(find "$SW_TARGET" -type f | wc -l)
+#S3_FILE_COUNT="3130"
+
+#if [ "$S3_COUNT" -lt "$S3_FILE_COUNT" ]
+#then
+#     /root/install/signalFinalStatus.sh 1 " FAILED to set /usr/sap and /sapmnt...check your S3 SAP software bucket: "$S3_COUNT" "$S3_FILE_COUNT" " 
+#     exit 1
+#fi
 
 if [ "$_SET_S3" == 0 ]
 then
