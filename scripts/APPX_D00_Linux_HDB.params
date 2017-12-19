@@ -52,7 +52,7 @@ NW_HDB_DBClient.clientPathStrategy = LOCAL
 NW_HDB_getDBInfo.systemDbPassword = 
 
 # Name of the SystemDB tenant in SAP HANA MultiDB Server. Default value - SystemDB
-NW_HDB_getDBInfo.systemDbSid = 
+NW_HDB_getDBInfo.systemDbSid = SystemDB
 
 # Deprecated do not use!
 NW_SAPCrypto.SAPCryptoFile = 

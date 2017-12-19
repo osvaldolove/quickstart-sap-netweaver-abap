@@ -88,7 +88,7 @@ NW_HDB_getDBInfo.instanceNumber = 00
 NW_HDB_getDBInfo.systemDbPassword =  
 
 # Name of the SystemDB tenant in SAP HANA MultiDB Server. Default value - SystemDB
-NW_HDB_getDBInfo.systemDbSid = 
+NW_HDB_getDBInfo.systemDbSid = SystemDB
 
 # Password of user system inside the SAP HANA Database Server
 NW_HDB_getDBInfo.systemPassword = 
