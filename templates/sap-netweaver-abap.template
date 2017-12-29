@@ -454,126 +454,126 @@
                 "RHEL66SAPHVM": "RHEL-6.6_HVM_GA-SAP-20150430-x86_64-2-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-905a54f8.2",
                 "RHEL67SAPHVM": "SAP-6.7_HVM-20160412-x86_64-1-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-afbdaec5.3",
                 "RHEL72SAPHVM": "SAP-7.2_HVM-20161206-x86_64-1-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-653c3b72.3",
-                "SLES11SP4HVM": "suse-sles-11-sp4-v20170621-hvm-ssd-x86_64",
+                "SLES11SP4HVM": "suse-sles-11-sp4-v20171212-hvm-ssd-x86_64",
                 "SLES12HVM": "suse-sles-12-v20151113-hvm-ssd-x86_64",
                 "SLES12SP1HVM": "suse-sles-12-sp1-v20161021-hvm-ssd-x86_64",
-                "SLES12SP1SAPHVM": "suse-sles-sap-12-sp1-v20170121-hvm-ssd-x86_64-2f28c0e5-af3e-4d22-95f1-6c1af645c209-ami-be32c5a8.3",
+                "SLES12SP1SAPHVM": "suse-sles-sap-12-sp1-v20171121-hvm-ssd-x86_64-f0188081-b780-4ee4-aef6-cbcb063fd11e-ami-8bac24f1.4",
                 "SLES12SP2HVM": "suse-sles-12-sp2-v20170620-hvm-ssd-x86_64"
             },
             "ap-northeast-1": {
                 "RHEL66SAPHVM": "ami-dce538dc",
                 "RHEL67SAPHVM": "ami-bded38dc",
                 "RHEL72SAPHVM": "ami-26127b41",
-                "SLES11SP4HVM": "ami-3deaff5a",
+                "SLES11SP4HVM": "ami-70a22016",
                 "SLES12HVM": "ami-0a705064",
                 "SLES12SP1HVM": "ami-d94fe9b8",
-                "SLES12SP1SAPHVM": "ami-559ee532",
+                "SLES12SP1SAPHVM": "ami-a6da67c0",
                 "SLES12SP2HVM": "ami-a07560c7"
             },
             "ap-northeast-2": {
                 "RHEL66SAPHVM": "ami-0d9d5363",
                 "RHEL67SAPHVM": "ami-8414c1ea",
                 "RHEL72SAPHVM": "ami-57845239",
-                "SLES11SP4HVM": "ami-b9c01fd7",
+                "SLES11SP4HVM": "ami-5353f53d",
                 "SLES12SP1HVM": "ami-1ced3972",
-                "SLES12SP1SAPHVM": "ami-68fd2c06",
+                "SLES12SP1SAPHVM": "ami-5f993e31",
                 "SLES12SP2HVM": "ami-86d00fe8"
             },
             "ap-south-1": {
                 "RHEL72SAPHVM": "ami-0af88f65",
-                "SLES11SP4HVM": "ami-91d1aefe",
+                "SLES11SP4HVM": "ami-2fbcf440",
                 "SLES12SP1HVM": "ami-985226f7",
-                "SLES12SP1SAPHVM": "ami-903243ff",
+                "SLES12SP1SAPHVM": "ami-b3e6a9dc",
                 "SLES12SP2HVM": "ami-62e39c0d"
             },
             "ap-southeast-1": {
                 "RHEL66SAPHVM": "ami-a6d5eef4",
                 "RHEL67SAPHVM": "ami-6c25fe0f",
                 "RHEL72SAPHVM": "ami-4440ef27",
-                "SLES11SP4HVM": "ami-d5fa76b6",
+                "SLES11SP4HVM": "ami-5e305022",
                 "SLES12HVM": "ami-2620e645",
                 "SLES12SP1HVM": "ami-163d9b75",
-                "SLES12SP1SAPHVM": "ami-e807ad8b",
+                "SLES12SP1SAPHVM": "ami-65a7f006",
                 "SLES12SP2HVM": "ami-f1078a92"
             },
             "ap-southeast-2": {
                 "RHEL66SAPHVM": "ami-a74c349d",
                 "RHEL67SAPHVM": "ami-8a6051e9",
                 "RHEL72SAPHVM": "ami-65330806",
-                "SLES11SP4HVM": "ami-63041400",
+                "SLES11SP4HVM": "ami-c8a553aa",
                 "SLES12HVM": "ami-96ecb2f5",
                 "SLES12SP1HVM": "ami-e32b1680",
-                "SLES12SP1SAPHVM": "ami-b01215d3",
+                "SLES12SP1SAPHVM": "ami-9abe54f8",
                 "SLES12SP2HVM": "ami-197a6a7a"
             },
             "eu-central-1": {
                 "RHEL66SAPHVM": "ami-4c073e51",
                 "RHEL67SAPHVM": "ami-b90bf8d6",
                 "RHEL72SAPHVM": "ami-5088483f",
-                "SLES11SP4HVM": "ami-a03d9acf",
+                "SLES11SP4HVM": "ami-dbe863b4",
                 "SLES12HVM": "ami-d7485abb",
                 "SLES12SP1HVM": "ami-59699036",
-                "SLES12SP1SAPHVM": "ami-f576b99a",
+                "SLES12SP1SAPHVM": "ami-7efc7e11",
                 "SLES12SP2HVM": "ami-984ee9f7"
             },
             "eu-west-1": {
                 "RHEL66SAPHVM": "ami-99126fee",
                 "RHEL67SAPHVM": "ami-a9d7aada",
                 "RHEL72SAPHVM": "ami-33bb9d40",
-                "SLES11SP4HVM": "ami-7afbe31c",
+                "SLES11SP4HVM": "ami-ea1d9893",
                 "SLES12HVM": "ami-c1f328b2",
                 "SLES12SP1HVM": "ami-b197d9c2",
-                "SLES12SP1SAPHVM": "ami-ec421d8a",
+                "SLES12SP1SAPHVM": "ami-03ef587a",
                 "SLES12SP2HVM": "ami-f5776f93"
             },
             "sa-east-1": {
                 "RHEL66SAPHVM": "ami-b3e666ae",
                 "RHEL67SAPHVM": "ami-87e272eb",
                 "RHEL72SAPHVM": "ami-c59f07a9",
-                "SLES11SP4HVM": "ami-f184ef9d",
+                "SLES11SP4HVM": "ami-716f291d",
                 "SLES12HVM": "ami-319e245d",
                 "SLES12SP1HVM": "ami-ce3aa7a2",
-                "SLES12SP1SAPHVM": "ami-f75e3b9b",
+                "SLES12SP1SAPHVM": "ami-798cc915",
                 "SLES12SP2HVM": "ami-52a4cf3e"
             },
             "us-east-1": {
                 "RHEL66SAPHVM": "ami-23ea0648",
                 "RHEL67SAPHVM": "ami-819ce996",
                 "RHEL72SAPHVM": "ami-67999070",
-                "SLES11SP4HVM": "ami-1a775e0c",
+                "SLES11SP4HVM": "ami-6f751f15",
                 "SLES12HVM": "ami-f2d5ad98",
                 "SLES12SP1HVM": "ami-1eeab909",
-                "SLES12SP1SAPHVM": "ami-cef80ed8",
+                "SLES12SP1SAPHVM": "ami-f20f8788",
                 "SLES12SP2HVM": "ami-8fac8399"
             },
             "us-east-2": {
                 "RHEL66SAPHVM": "ami-23ea0648",
                 "RHEL67SAPHVM": "ami-5cb7ec39",
                 "RHEL72SAPHVM": "ami-ddc993b8",
-                "SLES11SP4HVM": "ami-24674641",
+                "SLES11SP4HVM": "ami-d06c44b5",
                 "SLES12HVM": "ami-f2d5ad98",
                 "SLES12SP1HVM": "ami-85075de0",
-                "SLES12SP1SAPHVM": "ami-0c250069",
+                "SLES12SP1SAPHVM": "ami-3df7d958",
                 "SLES12SP2HVM": "ami-f990b69c"
             },
             "us-west-1": {
                 "RHEL66SAPHVM": "ami-3311fa77",
                 "RHEL67SAPHVM": "ami-92561af2",
                 "RHEL72SAPHVM": "ami-a7de88c7",
-                "SLES11SP4HVM": "ami-fcaf829c",
+                "SLES11SP4HVM": "ami-37626657",
                 "SLES12HVM": "ami-b56b05d5",
                 "SLES12SP1HVM": "ami-a12962c1",
-                "SLES12SP1SAPHVM": "ami-fc8ddf9c",
+                "SLES12SP1SAPHVM": "ami-5ce8d03c",
                 "SLES12SP2HVM": "ami-32c8e552"
             },
             "us-west-2": {
                 "RHEL66SAPHVM": "ami-15e1df25",
                 "RHEL67SAPHVM": "ami-3faa7a5f",
                 "RHEL72SAPHVM": "ami-9b4cf9fb",
-                "SLES11SP4HVM": "ami-1ac2d763",
+                "SLES11SP4HVM": "ami-e862c490",
                 "SLES12HVM": "ami-d51607b4",
                 "SLES12SP1HVM": "ami-7fa2061f",
-                "SLES12SP1SAPHVM": "ami-2f62dc4f",
+                "SLES12SP1SAPHVM": "ami-94fb26ec",
                 "SLES12SP2HVM": "ami-da786da3"
             }
         }
@@ -1531,7 +1531,6 @@
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"
                     },
-
                     "InstallSAP": {
                         "Ref": "InstallSAP"
                     },
