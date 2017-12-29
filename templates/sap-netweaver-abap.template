@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Deploy SAP HANA + App Server Cluster (ASCS, PAS & DB instance) + Additional App Server (qs-1no61sjkr)",
+    "Description": "Deploy SAP App Server Cluster (ASCS, PAS & DB instance) + Addtln. App Server (qs-1no61sjkr)",
     "Metadata": {
         "AWS::CloudFormation::Interface": {
             "ParameterGroups": [
@@ -17,29 +17,18 @@
                         "PrivateSubnet2CIDR",
                         "PublicSubnet1CIDR",
                         "PublicSubnet2CIDR",
-                        "PrivateSubnet1AID",
-                        "PublicSubnet1ID"
+                        "PrivateSubnet1AID"
                     ]
                 },
                 {
                     "Label": {
-                        "default": "HANA Server and storage configuration"
+                        "default": "Server and storage configuration"
                     },
                     "Description": {
                         "default": ""
                     },
                     "Parameters": [
-                        "MyOSHANA",
-                        "SAPHANAHostname",
-                        "HANAInstanceType",
-                        "HANAHostCount",
-                        "HANAMasterPass",
-                        "Encryption",
-                        "VolumeType",
-                        "KeyName",
-                        "HANAInstallMedia",
-                        "EnableLogging",
-                        "CloudTrailS3Bucket"
+                        "KeyName"
                     ]
                 },
                 {
@@ -54,6 +43,7 @@
                         "SAPPASHostname",
                         "SAPPASHostname",
                         "SAPHANAHostname",
+                        "SAPHANAIP",
                         "SID",
                         "SAPInstanceNum",
                         "SIDadmUID",
@@ -69,7 +59,7 @@
                 },
                 {
                     "Label": {
-                        "default": "SAP Additional App Server setup and configuration"
+                        "default": "SAP Addtln. App Server setup and configuration"
                     },
                     "Description": {
                         "default": ""
@@ -80,18 +70,6 @@
                         "PrivateSubnetID",
                         "AutoRecoveryAAS",
                         "InstallSAPAAS"
-                    ]
-                },
-                {
-                    "Label": {
-                        "default": "Optional configuration"
-                    },
-                    "Description": {
-                        "default": ""
-                    },
-                    "Parameters": [
-                        "InstallRDPInstance",
-                        "RDPInstanceType"
                     ]
                 },
                 {
@@ -109,7 +87,7 @@
             ],
             "ParameterLabels": {
                 "AASMyInstanceType": {
-                    "default": "SAP Additional App Server instance type"
+                    "default": "SAP Addtln. App Server instance type"
                 },
                 "AutoRecoveryAAS": {
                     "default": "EC2 Auto Recovery"
@@ -117,38 +95,14 @@
                 "AutoRecoveryPAS": {
                     "default": "EC2 Auto Recovery"
                 },
-                "CloudTrailS3Bucket": {
-                    "default": "S3 bucket for AWS CloudTrail & AWS Config logs"
-                },
-                "EnableLogging": {
-                    "default": "Enable AWS CloudTrail & AWS Config logs"
-                },
-                "Encryption": {
-                    "default": "Enable encryption"
-                },
-                "HANAHostCount": {
-                    "default": "SAP HANA host count"
-                },
-                "HANAInstallMedia": {
-                    "default": "S3 bucket for HANA s/w."
-                },
-                "HANAInstanceType": {
-                    "default": "SAP HANA Server "
-                },
-                "HANAMasterPass": {
-                    "default": "SAP HANA password"
-                },
                 "HostedZoneName": {
                     "default": "R53 private hosted zone"
-                },
-                "InstallRDPInstance": {
-                    "default": "Install RDP"
                 },
                 "InstallSAP": {
                     "default": "Install SAP software"
                 },
                 "InstallSAPAAS": {
-                    "default": "Install SAP Additional App Server"
+                    "default": "Install SAP Addtln. App Server"
                 },
                 "KeyName": {
                     "default": "SSH key pair"
@@ -159,9 +113,6 @@
                 "MyOS": {
                     "default": "O.S. version for SAP Servers (SLES only)"
                 },
-                "MyOSHANA": {
-                    "default": "O.S. version for SAP HANA Servers"
-                },
                 "PrivateSubnetID": {
                     "default": "AAS Private Subnet ID"
                 },
@@ -171,11 +122,11 @@
                 "PrivateSubnet1CIDR": {
                     "default": "1st Private Subnet CIDR"
                 },
+                "PrivateSubnet2AID": {
+                    "default": "2nd Private Subnet ID"
+                },
                 "PrivateSubnet1AID": {
                     "default": "1st Private Subnet ID"
-                },
-                "PublicSubnet1ID": {
-                    "default": "1st Public Subnet ID"
                 },
                 "PublicSubnet2CIDR": {
                     "default": "2nd Public Subnet CIDR"
@@ -189,17 +140,17 @@
                 "QSS3KeyPrefix": {
                     "default": "S3 key prefix for the Quick Start assets"
                 },
-                "RDPInstanceType": {
-                    "default": "RDP Instance type"
-                },
                 "SAPPASHostname": {
-                    "default": "SAP PAS Server host name (i.e. sappas00)"
+                    "default": "SAP P.A.S. Server host name (i.e. sappas00)"
                 },
                 "SAPAASHostname": {
-                    "default": "SAP AAS Server host name (i.e. sapaas00)"
+                    "default": "SAP A.A.S. Server host name (i.e. sapaas00)"
                 },
                 "SAPHANAHostname": {
                     "default": "SAP HANA Server host name (i.e. saphanaqs)"
+                },
+                "SAPHANAIP": {
+                    "default": "SAP HANA Server I.P."
                 },
                 "SAPInstallMediaBucket": {
                     "default": "S3 bucket for SAP s/w"
@@ -221,9 +172,6 @@
                 },
                 "SAPNetWeaverPass": {
                     "default": "SAP NetWeaver password"
-                },
-                "VolumeType": {
-                    "default": "EBS storage volume type"
                 },
                 "VPCID": {
                     "default": "VPC ID"
@@ -269,82 +217,14 @@
             "Description": "Instance type for SAP AAS Servers.",
             "Type": "String"
         },
-        "CloudTrailS3Bucket": {
-            "Description": "Name of Amazon S3 bucket where AWS CloudTrail Trail and AWS Config logs can be stored (e.g. mycloudtrail).",
-            "Default": "",
-            "Type": "String"
-        },
-        "EnableLogging": {
-            "Description": "Enable (Yes) or disable (No) logging with AWS CloudTrail and AWS Config",
-            "Default": "No",
-            "Type": "String",
-            "AllowedValues": [
-                "Yes",
-                "No"
-            ]
-        },
-        "Encryption": {
-            "AllowedValues": [
-                "Yes",
-                "No"
-            ],
-            "Default": "No",
-            "Description": "Enable (Yes) or disable (No) encryption on EBS volumes.",
-            "Type": "String"
-        },
-        "HANAHostCount": {
-            "Default": "1",
-            "Description": "Total number of SAP HANA nodes you want to deploy in the SAP HANA cluster.",
-            "MaxValue": "5",
-            "MinValue": "1",
-            "Type": "Number"
-        },
-        "HANAInstallMedia": {
-            "Default": "s3://   /",
-            "Description": "Name of your S3 bucket for your SAP HANA s/w. The s/w will *not* download if the format is not correct (e.g., s3://mysapbucket/HANA-media/).",
-            "Type": "String"
-        },
-        "HANAInstanceType": {
-            "AllowedValues": [
-                "r3.8xlarge",
-                "r3.4xlarge",
-                "r3.2xlarge",
-                "r4.16xlarge",
-                "r4.8xlarge",
-                "r4.4xlarge",
-                "r4.2xlarge",
-                "x1.16xlarge",
-                "x1.32xlarge",
-                "x1e.32xlarge"
-            ],
-            "Default": "r4.4xlarge",
-            "Description": "Instance type for SAP HANA host.",
-            "Type": "String"
-        },
-        "HANAMasterPass": {
-            "AllowedPattern": "^(?=.*?[a-z])(?=.*?[A-Z])(?=.*[0-9]).*",
-            "ConstraintDescription": "This must be at least 8 characters, including uppercase, lowercase, and numeric values.",
-            "Description": "SAP HANA password to use during installation.",
-            "MinLength": "8",
-            "NoEcho": "true",
-            "Type": "String"
-        },
         "HostedZoneName": {
-            "Description": "A *new* R53 private hosted zone will be created. Use a fully-qualified domain name e.g. mycompany.local",
+            "Description": "A *new* R53 privated hosted zone will be created. Use a fully-qualified domain name.",
             "Type": "String",
             "MinLength": "1",
             "MaxLength": "64",
             "AllowedPattern": "(?!-)[a-zA-Z0-9-.]*(?<!-)",
-            "ConstraintDescription": "must be a valid fully-qualified domain name."
-        },
-        "InstallRDPInstance": {
-            "AllowedValues": [
-                "Yes",
-                "No"
-            ],
-            "Default": "No",
-            "Description": "Install (Yes) or don't install (No) optional RDP instance.",
-            "Type": "String"
+            "ConstraintDescription": "must be a valid fully-qualified domain name.",
+            "Default": "mycompany.local"
         },
         "InstallSAP": {
             "AllowedValues": [
@@ -361,10 +241,11 @@
                 "No"
             ],
             "Default": "No",
-            "Description": "Install (Yes) or (No) don't install SAP Additional App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
+            "Description": "Install (Yes) or (No) don't install SAP Addtln. App Servers. When No, *only* the SAP ASCS, DB & PAS are installed.",
             "Type": "String"
         },
         "KeyName": {
+            "Default": "home",
             "Description": "Name of an existing Amazon EC2 key pair. All instances will launch with this key pair.",
             "Type": "AWS::EC2::KeyPair::KeyName"
         },
@@ -392,32 +273,15 @@
                 "SuSE-Linux-11-SP4-HVM",
                 "SuSE-Linux-12-HVM",
                 "SuSE-Linux-12-SP1-HVM",
-                "SuSE-Linux-12-SP2-HVM",
-                "SuSE-Linux-12-SP1-For-SAP-HVM",
-                "SuSE-Linux-12-SP2-For-SAP-HVM"
+                "SuSE-Linux-12-SP2-HVM"
             ],
             "Default": "SuSE-Linux-12-SP1-HVM",
             "Description": "Operating system (SLES only) version for SAP servers.",
             "Type": "String"
         },
-        "MyOSHANA": {
-            "Type": "String",
-            "Description": "Operating system version for HANA servers.",
-            "Default": "SuSE-Linux-12-SP1-HVM",
-            "AllowedValues": [
-                "Red-Hat-Enterprise-Linux-6.6-HVM",
-                "Red-Hat-Enterprise-Linux-6.7-HVM",
-                "Red-Hat-Enterprise-Linux-7.2-HVM",
-                "SuSE-Linux-11-SP4-HVM",
-                "SuSE-Linux-12-HVM",
-                "SuSE-Linux-12-SP1-HVM",
-                "SuSE-Linux-12-SP1-For-SAP-HVM",
-                "SuSE-Linux-12-SP2-For-SAP-HVM"
-            ]
-        },
         "PrivateSubnetID": {
             "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "Private subnet to deploy SAP Additional App Server.",
+            "Description": "Private subnet to deploy SAP Addtln. App Server .",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet1AID": {
@@ -446,11 +310,6 @@
             "Description": "CIDR block for the public (DMZ) subnet 1 located in Availability Zone 1",
             "Type": "String"
         },
-        "PublicSubnet1ID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
-            "Description": "The existing public subnet #1 in your VPC where your linux bastion and RDP are deployed.",
-            "Type": "AWS::EC2::Subnet::Id"
-        },
         "PublicSubnet2CIDR": {
             "AllowedPattern": "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/(1[6-9]|2[0-8]))$",
             "ConstraintDescription": "CIDR block parameter must be in the form x.x.x.x/16-28",
@@ -472,25 +331,19 @@
             "Description": "S3 key prefix for the Quick Start assets. Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).",
             "Type": "String"
         },
-        "RDPInstanceType": {
-            "AllowedValues": [
-                "c4.large",
-                "c4.xlarge",
-                "m4.large",
-                "m4.xlarge"
-            ],
-            "Default": "c4.large",
-            "Description": "Instance type for Windows RDP instance.",
-            "Type": "String"
-        },
         "SAPAASHostname": {
             "Default": "sapaas00",
-            "Description": "Host name to use for SAP AAS Server.",
+            "Description": "Host name to use for SAP A.A.S Server.",
             "Type": "String"
         },
         "SAPHANAHostname": {
             "Default": "saphanaqs",
             "Description": "Host name to use for SAP HANA database (SAP App server must be able to access HANA server).",
+            "Type": "String"
+        },
+        "SAPHANAIP": {
+            "Default": "10.0.x.x",
+            "Description": "I.P. address of the SAP HANA database (SAP App server must be able to access HANA server).",
             "Type": "String"
         },
         "SAPInstallMediaBucket": {
@@ -511,12 +364,12 @@
         },
         "SAPPASHostname": {
             "Default": "sappas00",
-            "Description": "Host name to use for SAP PAS Server (DNS short name).",
+            "Description": "Host name to use for SAP P.A.S Server (DNS short name).",
             "Type": "String"
         },
         "SAPNetWeaverPass": {
             "ConstraintDescription": "required SAP master password.",
-            "Description": "**Your SAP NW password**. **For now this is the same password as your SAP HANA password**",
+            "Description": "*Your SAP master password*. The password is stored encrypted in the EC2 SSM parameter store",
             "MinLength": "1",
             "NoEcho": "true",
             "Type": "String"
@@ -545,15 +398,6 @@
             "Description": "UID (default is 1001) for the SIDadm user.",
             "Type": "String"
         },
-        "VolumeType": {
-            "AllowedValues": [
-                "gp2",
-                "io1"
-            ],
-            "Default": "gp2",
-            "Description": "EBS volume type: General Purpose SSD (gp2) or Provisioned IOPS SSD (io1).",
-            "Type": "String"
-        },
         "VPCID": {
             "AllowedPattern": "vpc-[0-9a-z]{8}",
             "Description": "The existing Amazon VPC where you want to deploy SAP App Server Cluster.",
@@ -569,14 +413,6 @@
                 "Yes"
             ]
         },
-        "InstallRDP": {
-            "Fn::Equals": [
-                {
-                    "Ref": "InstallRDPInstance"
-                },
-                "Yes"
-            ]
-        },
         "InstallSAPAASCond": {
             "Fn::Equals": [
                 {
@@ -587,44 +423,6 @@
         }
     },
     "Mappings": {
-        "SAPHANAOSNameMap": {
-            "Red-Hat-Enterprise-Linux-6.6-HVM": {
-                "Code": "RedHatLinux66"
-            },
-            "Red-Hat-Enterprise-Linux-6.7-HVM": {
-                "Code": "RedHatLinux67"
-            },
-            "Red-Hat-Enterprise-Linux-7.2-HVM": {
-                "Code": "RedHatLinux72"
-            },
-            "SuSE-Linux-11-SP4-HVM": {
-                "Code": "SuSELinux11SP4"
-            },
-            "SuSE-Linux-12-HVM": {
-                "Code": "SuSELinux12"
-            },
-            "SuSE-Linux-12-SP1-HVM": {
-                "Code": "SuSELinux12SP1"
-            },
-            "SuSE-Linux-12-SP2-HVM": {
-                "Code": "SuSELinux12SP2"
-            },
-            "SuSE-Linux-12-SP1-For-SAP-HVM": {
-                "Code": "SuSELinux12SP1ForSAP"
-            },
-            "SuSE-Linux-12-SP2-For-SAP-HVM": {
-                "Code": "SuSELinux12SP2ForSAP"
-            },
-            "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM": {
-                "Code": "SuSELinux12SP1ForSAP-BYOS"
-            },
-            "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM": {
-                "Code": "SuSELinux12SP2ForSAP-BYOS"
-            },
-            "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM": {
-                "Code": "SuSELinux12SP3ForSAP-BYOS"
-            }
-        },
         "SAPAMINameMap": {
             "Red-Hat-Enterprise-Linux-6.6-HVM": {
                 "Code": "RHEL66SAPHVM"
@@ -649,18 +447,6 @@
             },
             "SuSE-Linux-12-SP1-For-SAP-HVM": {
                 "Code": "SLES12SP1SAPHVM"
-            },
-            "SuSE-Linux-12-SP2-For-SAP-HVM": {
-                "Code": "SLES12SP2SAPHVM"
-            },
-            "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM": {
-                "Code": "SLES12SP1SAPBYOSHVM"
-            },
-            "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM": {
-                "Code": "SLES12SP2SAPBYOSHVM"
-            },
-            "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM": {
-                "Code": "SLES12SP3SAPBYOSHVM"
             }
         },
         "AWSAMIRegionMap": {
@@ -668,179 +454,127 @@
                 "RHEL66SAPHVM": "RHEL-6.6_HVM_GA-SAP-20150430-x86_64-2-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-905a54f8.2",
                 "RHEL67SAPHVM": "SAP-6.7_HVM-20160412-x86_64-1-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-afbdaec5.3",
                 "RHEL72SAPHVM": "SAP-7.2_HVM-20161206-x86_64-1-Hourly2-GP2-b676039c-a4f8-4be7-9866-c804b1ade684-ami-653c3b72.3",
-                "SLES11SP4HVM": "suse-sles-11-sp4-v20171212-hvm-ssd-x86_64",
+                "SLES11SP4HVM": "suse-sles-11-sp4-v20170621-hvm-ssd-x86_64",
                 "SLES12HVM": "suse-sles-12-v20151113-hvm-ssd-x86_64",
                 "SLES12SP1HVM": "suse-sles-12-sp1-v20161021-hvm-ssd-x86_64",
-                "SLES12SP2HVM": "suse-sles-12-sp2-v20170620-hvm-ssd-x86_64",
-                "SLES12SP1SAPHVM": "suse-sles-sap-12-sp1-v20171121-hvm-ssd-x86_64-f0188081-b780-4ee4-aef6-cbcb063fd11e-ami-8bac24f1.4",
-                "SLES12SP2SAPHVM": "suse-sles-sap-12-sp2-v20171121-hvm-ssd-x86_64-e3458d64-5c36-4577-bd98-0ee19e3eaeec-ami-cbad25b1.4",
-                "SLES12SP1SAPBYOSHVM": "suse-sles-sap-12-sp1-byos-v20170123-hvm-ssd-x86_64",
-                "SLES12SP2SAPBYOSHVM": "suse-sles-sap-12-sp2-byos-v20161104-hvm-ssd-x86_64",
-                "SLES12SP3SAPBYOSHVM": "suse-sles-sap-12-sp3-byos-v20171121-hvm-ssd-x86_64"
+                "SLES12SP1SAPHVM": "suse-sles-sap-12-sp1-v20170121-hvm-ssd-x86_64-2f28c0e5-af3e-4d22-95f1-6c1af645c209-ami-be32c5a8.3",
+                "SLES12SP2HVM": "suse-sles-12-sp2-v20170620-hvm-ssd-x86_64"
             },
             "ap-northeast-1": {
                 "RHEL66SAPHVM": "ami-dce538dc",
                 "RHEL67SAPHVM": "ami-bded38dc",
                 "RHEL72SAPHVM": "ami-26127b41",
-                "SLES11SP4HVM": "ami-70a22016",
+                "SLES11SP4HVM": "ami-3deaff5a",
                 "SLES12HVM": "ami-0a705064",
                 "SLES12SP1HVM": "ami-d94fe9b8",
-                "SLES12SP1SAPBYOSHVM": "ami-63473c04",
-                "SLES12SP1SAPHVM": "ami-a6da67c0",
-                "SLES12SP2HVM": "ami-a07560c7",
-                "SLES12SP2SAPBYOSHVM": "ami-c01eb2a1",
-                "SLES12SP2SAPHVM": "ami-c1de63a7",
-                "SLES12SP3SAPBYOSHVM": "ami-b09d20d6"
+                "SLES12SP1SAPHVM": "ami-559ee532",
+                "SLES12SP2HVM": "ami-a07560c7"
             },
             "ap-northeast-2": {
                 "RHEL66SAPHVM": "ami-0d9d5363",
                 "RHEL67SAPHVM": "ami-8414c1ea",
                 "RHEL72SAPHVM": "ami-57845239",
-                "SLES11SP4HVM": "ami-5353f53d",
+                "SLES11SP4HVM": "ami-b9c01fd7",
                 "SLES12SP1HVM": "ami-1ced3972",
-                "SLES12SP1SAPBYOSHVM": "ami-b5f928db",
-                "SLES12SP1SAPHVM": "ami-5f993e31",
-                "SLES12SP2HVM": "ami-86d00fe8",
-                "SLES12SP2SAPBYOSHVM": "ami-8d5d89e3",
-                "SLES12SP2SAPHVM": "ami-0d983f63",
-                "SLES12SP3SAPBYOSHVM": "ami-cc62c5a2"
+                "SLES12SP1SAPHVM": "ami-68fd2c06",
+                "SLES12SP2HVM": "ami-86d00fe8"
             },
             "ap-south-1": {
                 "RHEL72SAPHVM": "ami-0af88f65",
-                "SLES11SP4HVM": "ami-2fbcf440",
+                "SLES11SP4HVM": "ami-91d1aefe",
                 "SLES12SP1HVM": "ami-985226f7",
-                "SLES12SP1SAPBYOSHVM": "ami-93c9bffc",
-                "SLES12SP1SAPHVM": "ami-b3e6a9dc",
-                "SLES12SP2HVM": "ami-62e39c0d",
-                "SLES12SP2SAPBYOSHVM": "ami-b390e4dc",
-                "SLES12SP2SAPHVM": "ami-b0e6a9df",
-                "SLES12SP3SAPBYOSHVM": "ami-47f5ba28"
+                "SLES12SP1SAPHVM": "ami-903243ff",
+                "SLES12SP2HVM": "ami-62e39c0d"
             },
             "ap-southeast-1": {
                 "RHEL66SAPHVM": "ami-a6d5eef4",
                 "RHEL67SAPHVM": "ami-6c25fe0f",
                 "RHEL72SAPHVM": "ami-4440ef27",
-                "SLES11SP4HVM": "ami-5e305022",
+                "SLES11SP4HVM": "ami-d5fa76b6",
                 "SLES12HVM": "ami-2620e645",
                 "SLES12SP1HVM": "ami-163d9b75",
-                "SLES12SP1SAPBYOSHVM": "ami-ab0aa0c8",
-                "SLES12SP1SAPHVM": "ami-65a7f006",
-                "SLES12SP2HVM": "ami-f1078a92",
-                "SLES12SP2SAPBYOSHVM": "ami-50963633",
-                "SLES12SP2SAPHVM": "ami-08a6f16b",
-                "SLES12SP3SAPBYOSHVM": "ami-1cedba7f"
+                "SLES12SP1SAPHVM": "ami-e807ad8b",
+                "SLES12SP2HVM": "ami-f1078a92"
             },
             "ap-southeast-2": {
                 "RHEL66SAPHVM": "ami-a74c349d",
                 "RHEL67SAPHVM": "ami-8a6051e9",
                 "RHEL72SAPHVM": "ami-65330806",
-                "SLES11SP4HVM": "ami-c8a553aa",
+                "SLES11SP4HVM": "ami-63041400",
                 "SLES12HVM": "ami-96ecb2f5",
                 "SLES12SP1HVM": "ami-e32b1680",
-                "SLES12SP1SAPBYOSHVM": "ami-460d0a25",
-                "SLES12SP1SAPHVM": "ami-9abe54f8",
-                "SLES12SP2HVM": "ami-197a6a7a",
-                "SLES12SP2SAPBYOSHVM": "ami-d1bf83b2",
-                "SLES12SP2SAPHVM": "ami-f8bc569a",
-                "SLES12SP3SAPBYOSHVM": "ami-1c9e747e"
+                "SLES12SP1SAPHVM": "ami-b01215d3",
+                "SLES12SP2HVM": "ami-197a6a7a"
             },
             "eu-central-1": {
                 "RHEL66SAPHVM": "ami-4c073e51",
                 "RHEL67SAPHVM": "ami-b90bf8d6",
                 "RHEL72SAPHVM": "ami-5088483f",
-                "SLES11SP4HVM": "ami-dbe863b4",
+                "SLES11SP4HVM": "ami-a03d9acf",
                 "SLES12HVM": "ami-d7485abb",
                 "SLES12SP1HVM": "ami-59699036",
-                "SLES12SP1SAPBYOSHVM": "ami-4b6ba424",
-                "SLES12SP1SAPHVM": "ami-7efc7e11",
-                "SLES12SP2HVM": "ami-984ee9f7",
-                "SLES12SP2SAPBYOSHVM": "ami-5a01fa35",
-                "SLES12SP2SAPHVM": "ami-c2fd7fad",
-                "SLES12SP3SAPBYOSHVM": "ami-59b53736"
+                "SLES12SP1SAPHVM": "ami-f576b99a",
+                "SLES12SP2HVM": "ami-984ee9f7"
             },
             "eu-west-1": {
                 "RHEL66SAPHVM": "ami-99126fee",
                 "RHEL67SAPHVM": "ami-a9d7aada",
                 "RHEL72SAPHVM": "ami-33bb9d40",
-                "SLES11SP4HVM": "ami-ea1d9893",
+                "SLES11SP4HVM": "ami-7afbe31c",
                 "SLES12HVM": "ami-c1f328b2",
                 "SLES12SP1HVM": "ami-b197d9c2",
-                "SLES12SP1SAPBYOSHVM": "ami-81025de7",
-                "SLES12SP1SAPHVM": "ami-03ef587a",
-                "SLES12SP2HVM": "ami-f5776f93",
-                "SLES12SP2SAPBYOSHVM": "ami-e4461297",
-                "SLES12SP2SAPHVM": "ami-06ef587f",
-                "SLES12SP3SAPBYOSHVM": "ami-8e74c3f7"
+                "SLES12SP1SAPHVM": "ami-ec421d8a",
+                "SLES12SP2HVM": "ami-f5776f93"
             },
             "sa-east-1": {
                 "RHEL66SAPHVM": "ami-b3e666ae",
                 "RHEL67SAPHVM": "ami-87e272eb",
                 "RHEL72SAPHVM": "ami-c59f07a9",
-                "SLES11SP4HVM": "ami-716f291d",
+                "SLES11SP4HVM": "ami-f184ef9d",
                 "SLES12HVM": "ami-319e245d",
                 "SLES12SP1HVM": "ami-ce3aa7a2",
-                "SLES12SP1SAPBYOSHVM": "ami-eb543187",
-                "SLES12SP1SAPHVM": "ami-798cc915",
-                "SLES12SP2HVM": "ami-52a4cf3e",
-                "SLES12SP2SAPBYOSHVM": "ami-9f33aff3",
-                "SLES12SP2SAPHVM": "ami-a48fcac8",
-                "SLES12SP3SAPBYOSHVM": "ami-f1a4e19d"
+                "SLES12SP1SAPHVM": "ami-f75e3b9b",
+                "SLES12SP2HVM": "ami-52a4cf3e"
             },
             "us-east-1": {
                 "RHEL66SAPHVM": "ami-23ea0648",
                 "RHEL67SAPHVM": "ami-819ce996",
                 "RHEL72SAPHVM": "ami-67999070",
-                "SLES11SP4HVM": "ami-6f751f15",
+                "SLES11SP4HVM": "ami-1a775e0c",
                 "SLES12HVM": "ami-f2d5ad98",
                 "SLES12SP1HVM": "ami-1eeab909",
-                "SLES12SP1SAPBYOSHVM": "ami-7dd2256b",
-                "SLES12SP1SAPHVM": "ami-f20f8788",
-                "SLES12SP2HVM": "ami-8fac8399",
-                "SLES12SP2SAPBYOSHVM": "ami-0ee0c619",
-                "SLES12SP2SAPHVM": "ami-64028a1e",
-                "SLES12SP3SAPBYOSHVM": "ami-0ac44f70"
+                "SLES12SP1SAPHVM": "ami-cef80ed8",
+                "SLES12SP2HVM": "ami-8fac8399"
             },
             "us-east-2": {
                 "RHEL66SAPHVM": "ami-23ea0648",
                 "RHEL67SAPHVM": "ami-5cb7ec39",
                 "RHEL72SAPHVM": "ami-ddc993b8",
-                "SLES11SP4HVM": "ami-d06c44b5",
+                "SLES11SP4HVM": "ami-24674641",
                 "SLES12HVM": "ami-f2d5ad98",
                 "SLES12SP1HVM": "ami-85075de0",
-                "SLES12SP1SAPBYOSHVM": "ami-ac2401c9",
-                "SLES12SP1SAPHVM": "ami-3df7d958",
-                "SLES12SP2HVM": "ami-f990b69c",
-                "SLES12SP2SAPBYOSHVM": "ami-68570d0d",
-                "SLES12SP2SAPHVM": "ami-36f7d953",
-                "SLES12SP3SAPBYOSHVM": "ami-37cae452"
+                "SLES12SP1SAPHVM": "ami-0c250069",
+                "SLES12SP2HVM": "ami-f990b69c"
             },
             "us-west-1": {
                 "RHEL66SAPHVM": "ami-3311fa77",
                 "RHEL67SAPHVM": "ami-92561af2",
                 "RHEL72SAPHVM": "ami-a7de88c7",
-                "SLES11SP4HVM": "ami-37626657",
+                "SLES11SP4HVM": "ami-fcaf829c",
                 "SLES12HVM": "ami-b56b05d5",
                 "SLES12SP1HVM": "ami-a12962c1",
-                "SLES12SP1SAPBYOSHVM": "ami-4a9dcf2a",
-                "SLES12SP1SAPHVM": "ami-5ce8d03c",
-                "SLES12SP2HVM": "ami-32c8e552",
-                "SLES12SP2SAPBYOSHVM": "ami-d098d2b0",
-                "SLES12SP2SAPHVM": "ami-5fe8d03f",
-                "SLES12SP3SAPBYOSHVM": "ami-84d4ece4"
+                "SLES12SP1SAPHVM": "ami-fc8ddf9c",
+                "SLES12SP2HVM": "ami-32c8e552"
             },
             "us-west-2": {
                 "RHEL66SAPHVM": "ami-15e1df25",
                 "RHEL67SAPHVM": "ami-3faa7a5f",
                 "RHEL72SAPHVM": "ami-9b4cf9fb",
-                "SLES11SP4HVM": "ami-e862c490",
+                "SLES11SP4HVM": "ami-1ac2d763",
                 "SLES12HVM": "ami-d51607b4",
                 "SLES12SP1HVM": "ami-7fa2061f",
-                "SLES12SP1SAPBYOSHVM": "ami-68922c08",
-                "SLES12SP1SAPHVM": "ami-94fb26ec",
-                "SLES12SP2HVM": "ami-da786da3",
-                "SLES12SP2SAPBYOSHVM": "ami-da1cbdba",
-                "SLES12SP2SAPHVM": "ami-95fb26ed",
-                "SLES12SP3SAPBYOSHVM": "ami-b623fece"
+                "SLES12SP1SAPHVM": "ami-2f62dc4f",
+                "SLES12SP2HVM": "ami-da786da3"
             }
         }
     },
@@ -879,79 +613,6 @@
                         }
                     }
                 ]
-            }
-        },
-        "HANAStack": {
-            "Type": "AWS::CloudFormation::Stack",
-            "Properties": {
-                "TemplateURL": {
-                    "Fn::Sub": "https://${QSS3BucketName}.s3.amazonaws.com/${QSS3KeyPrefix}submodules/quickstart-sap-hana/templates/SAP-HANA-BaseNodes.template"
-                },
-                "Parameters": {
-                    "DMZCIDR": {
-                        "Ref": "PublicSubnet1CIDR"
-                    },
-                    "DMZSubnet": {
-                        "Ref": "PublicSubnet1ID"
-                    },
-                    "Encryption": {
-                        "Ref": "Encryption"
-                    },
-                    "HANAInstallMedia": {
-                        "Ref": "HANAInstallMedia"
-                    },
-                    "HANAMasterHostname": {
-                        "Ref": "SAPHANAHostname"
-                    },
-                    "HANAMasterPass": {
-                        "Ref": "HANAMasterPass"
-                    },
-                    "HANASubnet": {
-                        "Ref": "PrivateSubnet1AID"
-                    },
-                    "HostCount": {
-                        "Ref": "HANAHostCount"
-                    },
-                    "InstallHANA": {
-                        "Ref": "InstallSAP"
-                    },
-                    "InstallRDPInstance": {
-                        "Ref": "InstallRDPInstance"
-                    },
-                    "KeyName": {
-                        "Ref": "KeyName"
-                    },
-                    "MyOS": {
-                        "Fn::FindInMap": [
-                            "SAPHANAOSNameMap",
-                            {
-                                "Ref": "MyOSHANA"
-                            },
-                            "Code"
-                        ]
-                    },
-                    "MyInstanceType": {
-                        "Ref": "HANAInstanceType"
-                    },
-                    "PrivSubCIDR": {
-                        "Ref": "PrivateSubnet1CIDR"
-                    },
-                    "RDPInstanceType": {
-                        "Ref": "RDPInstanceType"
-                    },
-                    "SAPInstanceNum": {
-                        "Ref": "SAPInstanceNum"
-                    },
-                    "SID": {
-                        "Ref": "SID"
-                    },
-                    "VolumeType": {
-                        "Ref": "VolumeType"
-                    },
-                    "VPCID": {
-                        "Ref": "VPCID"
-                    }
-                }
             }
         },
         "HostedZone": {
@@ -1493,7 +1154,7 @@
         },
         "SAPHANAR53Record": {
             "Type": "AWS::Route53::RecordSet",
-            "DependsOn": "HANAStack",
+            "DependsOn": "HostedZone",
             "Properties": {
                 "HostedZoneId": {
                     "Ref": "HostedZone"
@@ -1505,17 +1166,14 @@
                 "TTL": "30",
                 "ResourceRecords": [
                     {
-                        "Fn::GetAtt": [
-                            "HANAStack",
-                            "Outputs.HANAMasterInstanceIP"
-                        ]
+                        "Ref": "SAPHANAIP"
                     }
                 ]
             }
         },
         "SAPPASR53Record": {
             "Type": "AWS::Route53::RecordSet",
-            "DependsOn": "SAPPASInstance",
+            "DependsOn": "HostedZone",
             "Properties": {
                 "HostedZoneId": {
                     "Ref": "HostedZone"
@@ -1550,7 +1208,6 @@
             "Properties": {}
         },
         "SAPPASInstance": {
-            "DependsOn": "HANAStack",
             "Type": "AWS::EC2::Instance",
             "Metadata": {
                 "AWS::CloudFormation::Authentication": {
@@ -1621,10 +1278,7 @@
                                             "\n",
                                             "export DBIP=",
                                             {
-                                                "Fn::GetAtt": [
-                                                    "HANAStack",
-                                                    "Outputs.HANAMasterInstanceIP"
-                                                ]
+                                                "Ref": "SAPHANAIP"
                                             },
                                             "\n",
                                             "export MyOS=",
@@ -1829,7 +1483,7 @@
                                 "       wget https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
                                 "       gzip -df aws-cfn-bootstrap-latest.tar.gz\n",
                                 "       tar -xvf aws-cfn-bootstrap-latest.tar\n",
-                                "       #ln -s /tmp/aws-cfn-bootstrap-1.4 /opt/aws\n",
+                                "       ln -s /tmp/aws-cfn-bootstrap-1.4 /opt/aws\n",
                                 "       chmod -R 755 /tmp/aws-cfn-bootstrap-1.4\n",
                                 "       which pip &> /dev/null\n",
                                 "       if [ $? -ne 0 ] ;then\n",
@@ -1841,8 +1495,8 @@
                                 "       pip install --upgrade pip\n",
                                 "       pip install --upgrade setuptools\n",
                                 "       pip install awscli --ignore-installed six &> /dev/null\n",
-                                "       export PYTHONPATH=/tmp/aws-cfn-bootstrap-1.4:$PYTHONPATH\n",
-                                "/tmp/aws-cfn-bootstrap-1.4/bin/cfn-init -v ",
+                                "       export PYTHONPATH=/opt/aws:$PYTHONPATH\n",
+                                "/opt/aws/bin/cfn-init -v ",
                                 "         --stack ",
                                 {
                                     "Ref": "AWS::StackName"
@@ -1877,6 +1531,7 @@
                     "HostedZoneName": {
                         "Ref": "HostedZoneName"
                     },
+
                     "InstallSAP": {
                         "Ref": "InstallSAP"
                     },
@@ -1917,10 +1572,7 @@
                         "Ref": "SAPHANAHostname"
                     },
                     "SAPHANAIP": {
-                        "Fn::GetAtt": [
-                            "HANAStack",
-                            "Outputs.HANAMasterInstanceIP"
-                        ]
+                        "Ref": "SAPHANAIP"
                     },
                     "SAPInstanceNum": {
                         "Ref": "SAPInstanceNum"
