@@ -1842,7 +1842,7 @@
                                 "       pip install --upgrade setuptools\n",
                                 "       pip install awscli --ignore-installed six &> /dev/null\n",
                                 "       export PYTHONPATH=/tmp/aws-cfn-bootstrap-1.4:$PYTHONPATH\n",
-                                "/tmp/aws-cfn-bootstrap-1.4/bin/cfn-init -v ",
+                                "       /tmp/aws-cfn-bootstrap-1.4/bin/cfn-init -v ",
                                 "         --stack ",
                                 {
                                     "Ref": "AWS::StackName"
