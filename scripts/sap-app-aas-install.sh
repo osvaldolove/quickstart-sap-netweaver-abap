@@ -154,12 +154,16 @@ set_aasinifile() {
 	#set the profile directory
 	sed -i  "/NW_readProfileDir.profileDir/ c\NW_readProfileDir.profileDir = /sapmnt/${SAP_SID}/profile" $INI_FILE
 
-        _VAL_MP=$(grep "$MP" $INI_FILE)
-	_VAL_SAP_SID=$(grep "$SAP_SID" $INI_FILE)
+
+	#set the Schema 
+	sed -i  "/HDB_Schema_Check_Dialogs.schemaName/ c\HDB_Schema_Check_Dialogs.schemaName = ${SAP_SCHEMA_NAME}" $INI_FILE
 
 	#set the UID and GID
 	sed -i  "/nwUsers.sidAdmUID/ c\nwUsers.sidAdmUID = ${SIDadmUID}" $INI_FILE
 	sed -i  "/nwUsers.sapsysGID/ c\nwUsers.sapsysGID = ${SAPsysGID}" $INI_FILE
+
+        _VAL_MP=$(grep "$MP" $INI_FILE)
+	_VAL_SAP_SID=$(grep "$SAP_SID" $INI_FILE)
 
 	if [ -n "$_VAL_MP" -a "$_VAL_SAP_SID"]
 	then

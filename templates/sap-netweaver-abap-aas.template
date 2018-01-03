@@ -312,6 +312,11 @@
             "Description": "The TimeZone of your SAP Server (PT, CT, ET, or UTC)",
             "Type": "String"
         },
+        "SAPSchemaName": {
+            "Default": "SAPABAP1",
+            "Description": "SAP ABAP Schema name for HANA database .",
+            "Type": "String"
+        },
         "SID": {
             "AllowedPattern": "([A-Z]{1}[0-9A-Z]{2})",
             "ConstraintDescription": "This value must consist of 3 characters.",
@@ -1051,6 +1056,11 @@
                                             "export INSTALL_SAP=",
                                             {
                                                 "Ref": "InstallSAP"
+                                            },
+                                            "\n",
+                                            "export SAP_SCHEMA_NAME=",
+                                            {
+                                                "Ref": "SAPSchemaName"
                                             },
                                             "\n",
                                             "export SAP_SID=",
