@@ -45,6 +45,7 @@
                         "SAPHANAHostname",
                         "SAPHANAIP",
                         "SID",
+                        "SAPSchemaName",
                         "SAPInstanceNum",
                         "SIDadmUID",
                         "SAPTZ",
@@ -157,6 +158,9 @@
                 },
                 "SAPInstallMediaKeyPrefix": {
                     "default": "S3 Key Prefix for SAP s/w"
+                },
+                "SAPSchemaName": {
+                    "default": "SAP database schema"
                 },
                 "SID": {
                     "default": "SAP system ID"

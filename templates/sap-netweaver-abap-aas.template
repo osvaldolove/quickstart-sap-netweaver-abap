@@ -47,6 +47,7 @@
                         "SAPHANAIP",
                         "SAPAASHostname",
                         "SID",
+                        "SAPSchemaName",
                         "SAPInstanceNum",
                         "SIDadmUID",
                         "SAPTZ",
@@ -133,6 +134,9 @@
                 },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
+                },
+                "SAPSchemaName": {
+                    "default": "SAP database schema"
                 },
                 "SID": {
                     "default": "SAP system ID"

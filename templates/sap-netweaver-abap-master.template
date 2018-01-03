@@ -55,6 +55,7 @@
                         "AutoRecoveryPAS",
                         "SAPPASHostname",
                         "SID",
+                        "SAPSchemaName",
                         "MyInstanceType",
                         "SAPInstanceNum",
                         "SIDadmUID",
@@ -209,6 +210,9 @@
                 },
                 "SAPTZ": {
                     "default": "SAP Server timezone"
+                },
+                "SAPSchemaName": {
+                    "default": "SAP database schema"
                 },
                 "SID": {
                     "default": "SAP system ID"
@@ -537,6 +541,11 @@
             "Description": "SAP system ID for installation and setup.",
             "Type": "String"
         },
+        "SAPSchemaName": {
+            "Default": "SAPABAP1",
+            "Description": "SAP ABAP Schema name for HANA database.",
+            "Type": "String"
+        },
         "SIDadmUID": {
             "Default": "1001",
             "Description": "UID (default is 1001) for the SIDadm user.",
@@ -790,6 +799,9 @@
                     },
                     "SAPTZ": {
                         "Ref": "SAPTZ"
+                    },
+                    "SAPSchemaName": {
+                        "Ref": "SAPSchemaName"
                     },
                     "SID": {
                         "Ref": "SID"
