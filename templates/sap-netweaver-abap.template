@@ -284,12 +284,10 @@
             "Type": "String"
         },
         "PrivateSubnetID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
             "Description": "Private subnet to deploy SAP Addtln. App Server .",
             "Type": "AWS::EC2::Subnet::Id"
         },
         "PrivateSubnet1AID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
             "Description": "The existing private subnet #1 in your VPC where you want to deploy SAP App Server Cluster.",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -408,7 +406,6 @@
             "Type": "String"
         },
         "VPCID": {
-            "AllowedPattern": "vpc-[0-9a-z]{8}",
             "Description": "The existing Amazon VPC where you want to deploy SAP App Server Cluster.",
             "Type": "AWS::EC2::VPC::Id"
         }

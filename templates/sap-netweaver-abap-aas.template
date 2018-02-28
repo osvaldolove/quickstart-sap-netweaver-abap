@@ -219,7 +219,6 @@
             "Type": "String"
         },
         "PrivateSubnetID": {
-            "AllowedPattern": "subnet-[0-9a-z]{8}",
             "Description": "Private subnet to deploy SAP Additional App Server.",
             "Type": "AWS::EC2::Subnet::Id"
         },
@@ -334,8 +333,6 @@
             "Type": "String"
         },
         "VPCID": {
-            "AllowedPattern": "vpc-[0-9a-z]{8}",
-            "Default": "vpc-xxxxxxxx",
             "Description": "The existing Amazon VPC where you want to deploy SAP App Server Cluster.",
             "Type": "AWS::EC2::VPC::Id"
         }
