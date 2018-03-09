@@ -351,31 +351,31 @@
             "RedHatLinux73ForSAP": {
                 "Code": "RHEL73SAPHVM"
             },
-            "SuSELinux11SP4": {
+            "SuSE-Linux-11-SP4-HVM": {
                 "Code": "SLES11SP4HVM"
             },
-            "SuSELinux12SP1": {
+            "SuSE-Linux-12-HVM": {
+                "Code": "SLES12HVM"
+            },
+            "SuSE-Linux-12-SP1-HVM": {
                 "Code": "SLES12SP1HVM"
             },
-            "SuSELinux12SP2": {
+            "SuSE-Linux-12-SP2-HVM": {
                 "Code": "SLES12SP2HVM"
             },
-            "SuSELinux12SP1ForSAP": {
+            "SuSE-Linux-12-SP1-For-SAP-HVM": {
                 "Code": "SLES12SP1SAPHVM"
             },
-            "SuSELinux12SP2ForSAP": {
+            "SuSE-Linux-12-SP2-For-SAP-HVM": {
                 "Code": "SLES12SP2SAPHVM"
             },
-            "SuSELinux12SP3ForSAP": {
-                "Code": "SLES12SP3SAPHVM"
-            },
-            "SuSELinux12SP1ForSAP-BYOS": {
+            "SuSE-Linux-12-SP1-For-SAP-BYOS-HVM": {
                 "Code": "SLES12SP1SAPBYOSHVM"
             },
-            "SuSELinux12SP2ForSAP-BYOS": {
+            "SuSE-Linux-12-SP2-For-SAP-BYOS-HVM": {
                 "Code": "SLES12SP2SAPBYOSHVM"
             },
-            "SuSELinux12SP3ForSAP-BYOS": {
+            "SuSE-Linux-12-SP3-For-SAP-BYOS-HVM": {
                 "Code": "SLES12SP3SAPBYOSHVM"
             }
         },
