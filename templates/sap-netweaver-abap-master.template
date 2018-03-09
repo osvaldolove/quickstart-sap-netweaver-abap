@@ -405,7 +405,6 @@
         "MyOS": {
             "AllowedValues": [
                 "SuSE-Linux-11-SP4-HVM",
-                "SuSE-Linux-12-HVM",
                 "SuSE-Linux-12-SP1-HVM",
                 "SuSE-Linux-12-SP2-HVM",
                 "SuSE-Linux-12-SP1-For-SAP-HVM",
@@ -420,11 +419,8 @@
             "Description": "Operating system version for HANA servers.",
             "Default": "SuSE-Linux-12-SP1-HVM",
             "AllowedValues": [
-                "Red-Hat-Enterprise-Linux-6.6-HVM",
-                "Red-Hat-Enterprise-Linux-6.7-HVM",
-                "Red-Hat-Enterprise-Linux-7.2-HVM",
+                "Red-Hat-Enterprise-Linux-7.3-For-SAP-HVM",
                 "SuSE-Linux-11-SP4-HVM",
-                "SuSE-Linux-12-HVM",
                 "SuSE-Linux-12-SP1-HVM",
                 "SuSE-Linux-12-SP1-For-SAP-HVM",
                 "SuSE-Linux-12-SP2-For-SAP-HVM"

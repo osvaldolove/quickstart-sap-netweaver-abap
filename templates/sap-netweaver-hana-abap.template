@@ -406,7 +406,7 @@
         "MyOSHANA": {
             "Type": "String",
             "Description": "Operating system version for HANA servers.",
-            "Default": "SuSE-Linux-12-SP2-HVM",
+            "Default": "SuSE-Linux-12-SP1-HVM",
             "AllowedValues": [
                 "Red-Hat-Enterprise-Linux-7.3-For-SAP-HVM",
                 "SuSE-Linux-11-SP4-HVM",
